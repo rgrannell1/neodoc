@@ -9,13 +9,12 @@ Will be solved by parsed `Options`.
 parse as:
 
 ```javascript
-[ { type: 'flag',
-  , name: '-f',
+[ { type: 'FLAG'
+  , name: '-f'
   , value: 'FILE'
+  , ambiguity: 'POSITIONAL'
   }
-, { type: 'positional'
-  , name: 'FILE'
-  } ]
+]
 ```
 
 #### my_program.py -fFILE
@@ -24,27 +23,17 @@ Ambiguity, must parse both as stacked
 `-f -F -I -L -E`, as well as `-f FILE`
 Will be solved by parsed `Options`.
 
+Assume `-fFILE` means `-f` with value
+`FILE`, even though the docopt specs
+default to the opposite.
+
 parse as:
 
 ```javascript
-[ { type: 'flag'
+[ { type: 'FLAG'
   , name: '-f'
   , value: 'FILE'
-  }
-, { type: 'flag'
-  , name: '-f'
-  }
-, { type: 'flag'
-  , name: '-F'
-  }
-, { type: 'flag'
-  , name: '-I'
-  }
-, { type: 'flag'
-  , name: '-L'
-  }
-, { type: 'flag'
-  , name: '-E'
+  , ambiguity: 'MERGED_FLAGS'
   }
 ]
 ```
