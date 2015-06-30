@@ -1,0 +1,2 @@
+Usage: my_program.py FILE <blah>
+       my_program.py COUNT FILE

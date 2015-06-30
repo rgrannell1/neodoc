@@ -1,0 +1,4 @@
+*.sw[opqrstuv]
+*.un~
+node_modules
+
