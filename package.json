@@ -19,6 +19,7 @@
   "dependencies": {
     "bennu": "^17.3.0",
     "bluebird": "^2.9.30",
-    "lodash": "^3.9.3"
+    "lodash": "^3.9.3",
+    "nu-stream": "^3.3.1"
   }
 }

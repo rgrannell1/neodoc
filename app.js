@@ -7,6 +7,7 @@ var _ = require('lodash')
   , lang = require('bennu').lang
   , text = require('bennu').text
   , fs = require('fs')
+  , nu = require('nu-stream')
 ;
 
 var input = fs
@@ -33,56 +34,49 @@ var Casing = {
  * @param {Casing|Boolean} casing
  * The casing to use when matching.
  */
-var string = function(s, casing) {
+var string = function(str, casing) {
     casing = (typeof casing === 'string')
                 ? casing
            : (typeof casing === 'boolean')
                 ? (casing ? Casing.SENSITIVE : Casing.INSENSITIVE)
            : Casing.INSENSITIVE;
-    return parse.attempt(_.foldr(s, function(p, c, i, s) {
+    return parse.attempt(_.foldr(str, function(p, c, i, s) {
         return parse.next(parse.token(function(t) {
             return ((t === c)
               || (casing === Casing.INSENSITIVE
                   && t.toLowerCase() === c.toLowerCase()));
         }), p);
-    }, parse.always(s)))
+    }, parse.always(str)));
 };
-
-/**
- * Parse a alpha numeric character.
- */
-var alphaNum = text.match(/[0-9a-z]/i, "any letter or digit");
 
 /**
  * Parse a space character.
  */
-var space = text.match(/[ ]/, "space");
+var space = text.match(/[ ]/, 'space');
 
 /**
  * Run function `f` on the result
  * of the parser `p`.
  *
+ * @param {Parser}
+ * The parser to run the function on.
+ *
  * @param {Function} f
  * The function to apply to the results.
  *
- * @returns {Function}
- * Returns a function that, when applied to
- * a parser, will run that parser and then
- * apply `f` to it's results.
+ * @return {Parser}
  */
-var transform = function(f) {
-    return function(p) {
-        return parse.chain(p, function(xs) {
-            return parse.of(f(xs));
-        })
-    };
-}
+var transform = function(p, f) {
+    return parse.chain(p, function(xs) {
+        return parse.of(f(xs));
+    });
+};
 
 /**
  * Concatenate the results of a parse.
  *
  * @param {String} sep
- * The seperator to use.
+ * The separator to use.
  *
  * @param {Parser} parser
  * The parser to apply the concatenation on.
@@ -90,9 +84,9 @@ var transform = function(f) {
  * @returns {Parser}
  */
 var concatWith = function(sep, parser) {
-    return transform(function(xs) {
+    return transform(parser, function(xs) {
         return xs.join(sep);
-    })(parser);
+    });
 };
 
 /* @see concatWith */
@@ -102,9 +96,9 @@ var concat = _.partial(concatWith, '');
  * Consume a repeating parser `parser` eagerly.
  *
  * @param {Parser} parser
- * The parter to repeat using `parse.many`
+ * The parser to repeat using `parse.many`
  *
- * @return {Parser}
+ * @returns {Parser}
  */
 var eager = function(parser) {
     return parse.eager(parse.many(parser));
@@ -116,57 +110,158 @@ var eager = function(parser) {
  * Must at least make one match.
  *
  * @param {Parser} parser
- * The parter to repeat using `parse.many`
+ * The parser to repeat using `parse.many`
  *
- * @return {Parser}
+ * @returns {Parser}
  */
 var eager1 = function(parser) {
     return parse.eager(parse.many1(parser));
 };
 
 /**
+ * Fold over all give parsers, applying
+ * them in sequence and consing their results
+ * into an array.
+ *
+ * @param {...Parser} parsers
+ * The parsers to sequence and cons.
+ *
+ * @returns {Parser}
+ */
+var cons = function() {
+    return _.foldl(_.toArray(arguments), function(acc, parser) {
+        return acc.chain(function(accout) {
+            return parser.chain(function(parserout) {
+                return parse.of(accout.concat([ parserout ]));
+            });
+        });
+    });
+};
+
+/**
+ * Runs a parser recursively, collecting
+ * results of `parser` in a list.
+ *
+ * @param {Parser} parser
+ * The parser to run repeatedly
+ *
+ * @returns {Parser}
+ */
+var repeatedly = function(parser) {
+    return parse.rec(function(self) {
+        return parse.optional([],
+            parser.chain(function(x) {
+                return self.chain(function(xs) {
+                    return parse.of([x].concat(xs));
+                });
+            })
+        );
+    });
+};
+
+
+/**
  * Parse the program name.
  */
-var programName = concat(eager1(text.match(/[0-9a-z_\-.]/)));
+var program = concat(eager1(text.match(/[0-9a-z_\-.]/)));
+
+/**
+ * Parse an ARGUMENT name
+ */
+var ARGNAME = cons(
+    text.match(/[A-Z]/)
+  , concat(eager(text.match(/[A-Z\-]/))));
+
+/**
+ * Parse an argument
+ */
+var argname = cons(
+    text.match(/[a-z]/)
+  , concat(eager(text.match(/[a-z\-]/))));
 
 /**
  * Parses an argument, either:
  *
  * `ARGUMENT` or `<argument>`
  */
-var argument = parse.either(
-    concat(eager1(text.match(/[A-Z\-]/)))
+var positionalArg = parse.either(
+    ARGNAME
   , lang.between(
         text.character('<')
       , text.character('>')
-      , concat(eager1(text.match(/[a-z\-]/i)))
+      , argname
     )
 );
 
-/
-var usageRow = programName.chain(function(name) {
+var ARG_TYPE = {
+    FLAG:     'FLAG'
+  , POSITION: 'POSITION'
+  , OPTION:   'OPTION'
+};
 
-    // --------------------------------
-    // Parse arguments on the same line
-    // --------------------------------
-    return parse.rec(function(self) {
-        return parse.optional(
-            []
-          , parse.next(parse.many(space), argument)
-                .chain(function(x) {
-                    return self.chain(function(xs) {
-                        return parse.of([x].concat(xs));
-                    });
-                })
-        );
-    })
+/**
+ * Parse a single option, i.e.:
+ *     --output=<arg>
+ *     --some-flag
+ *     -s
+ *     -abc
+ */
+var optionArg = lang.then(parse.choice(
+    parse.attempt(
+        cons(
+            text.string('--')
+          , argname
+          , text.string('=')
+          , lang.between(
+                text.character('<')
+              , text.character('>')
+              , argname
+            )))
+  , parse.attempt(
+        cons(text.string('--'), argname))
+), parse.many(text.space));
+
+
+var maybeOptionalArg = function(parser) {
+    return parse.either(
+        transform(
+            lang.between(
+                text.character('[')
+              , text.character(']')
+              , parser
+            )
+          , function(name) { return { arg: name, optional: true } }
+        )
+      , transform(
+            parser
+          , function(name) { return { arg: name, optional: false } }
+        )
+    )
+};
+
+var argument = parse.choice(
+    maybeOptionalArg(parse.attempt(optionArg))
+  , maybeOptionalArg(parse.attempt(positionalArg))
+);
+
+/*
+ * Parses a single `usage` row, i.e. one of:
+ *
+ *   naval_fate ship new <name>...
+ *   naval_fate ship <name> move <x> <y> [--speed=<kn>]
+ *   naval_fate ship shoot <x> <y>
+ *   naval_fate mine (set|remove) <x> <y> [--moored|--drifting]
+ *   naval_fate -h | --help
+ *   naval_fate --version
+ */
+var usageRow = program.chain(function(name) {
+    return repeatedly(parse.next(parse.many(space), argument))
         .chain(function(args) {
-            console.log(args);
             return parse.of({
                 name: name
               , args: args
             });
-        })
+        });
 });
 
 var usage = parse.next(
