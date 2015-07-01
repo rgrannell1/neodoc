@@ -157,6 +157,17 @@ var repeatedly = function(parser) {
     });
 };
 
+/**
+ * Ignore white space before and after
+ */
+var $ = function(p) {
+    return lang.then(
+        parse.next(parse.many(space), p)
+      , parse.many(space)
+    );
+};
+
+module.exports.$ = $;
 module.exports.string = string;
 module.exports.string.Casing = Casing;
 module.exports.space = space;

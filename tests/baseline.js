@@ -161,3 +161,17 @@ describe('repeatedly', function() {
         );
     })
 });
+
+describe('$', function() {
+    it('ignores all whitespace', function() {
+        _.each(['a', ' aaaa', '  a', ' aa ', 'aa ', 'aaa  ', '  aa  '], function(s) {
+            assert.equal(
+                s.trim()
+              , parse.run(
+                    base.$(base.join(base.eager(text.character('a'))))
+                  , s
+                )
+            );
+        });
+    });
+});

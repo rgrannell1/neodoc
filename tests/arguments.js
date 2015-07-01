@@ -67,9 +67,9 @@ describe('baseline', function() {
                   , '--output=<arg>'
                 );
 
-                assert.equal(opt.type, args.ARG_TYPE.OPTION);
+                assert.equal(opt.type, args.OPT_TYPE.LONG);
                 assert.equal(opt.name, 'output');
-                assert.equal(opt.val, '<arg>');
+                assert.equal(opt.arg, '<arg>');
             });
         });
 
@@ -80,8 +80,20 @@ describe('baseline', function() {
                   , '--some-feature'
                 );
 
-                assert.equal(opt.type, args.ARG_TYPE.FLAG);
+                assert.equal(opt.type, args.OPT_TYPE.LONG);
                 assert.equal(opt.name, 'some-feature');
+            });
+        });
+
+        describe('-fFILE', function() {
+            it('should be parsed as stacked flags `-f -F -I -L -E`', function() {
+                var opt = parse.run(
+                    args.option
+                  , '-fFILE'
+                );
+
+                assert.equal(opt.type, args.OPT_TYPE.SHORT);
+                assert.equal(opt.name, 'fFILE');
             });
         });
     });

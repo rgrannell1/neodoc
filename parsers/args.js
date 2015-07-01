@@ -12,10 +12,9 @@ var _ = require('lodash')
  * @enum
  * @readonly
  */
-var ARG_TYPE = {
-    FLAG:     'FLAG'
-  , POSITION: 'POSITION'
-  , OPTION:   'OPTION'
+var OPT_TYPE = {
+    SHORT: 'FLAG'
+  , LONG:  'LONG'
 };
 
 /**
@@ -50,15 +49,13 @@ var positionalArg = parse.either(ARGNAME, _argname_);
 
 /**
  * Parse a single option, i.e.:
- *     --output=<file>
- *     --some-feature
- *     -s
- *     -abc
+ *     --output=<file>, --some-feature
+ *     -s, -abc
  *
- * Parse ambiguos matches, resolve later:
- *     --output FILE
- *     -s FILE
- *     -abc FILE
+ * Parse ambiguos matches:
+ * Assume option w/o argument, resolve later:
+ *     --output FILE -> [ --output, FILE ]
+ *     -abc FILE     -> [ -abc,     FILE ]
  */
 var option = lang.then(parse.choice(
     parse.attempt(
@@ -68,16 +65,19 @@ var option = lang.then(parse.choice(
                     text.string('--')
                   , argname
                 )
-              , parse.next(
-                    text.string('=')
-                  , _argname_
+              , parse.optional(
+                    null
+                  , parse.next(
+                        text.string('=')
+                      , _argname_
+                    )
                 )
             )
-          , _.spread(function(name, val) {
+          , _.spread(function(name, arg) {
                 return {
-                    type: ARG_TYPE.OPTION
+                    type: OPT_TYPE.LONG
                   , name: name
-                  , val:  val
+                  , arg:  arg
                 };
             })
         )
@@ -85,15 +85,15 @@ var option = lang.then(parse.choice(
   , parse.attempt(
         base.transform(
             parse.next(
-                text.string('--')
-              , argname
+                text.character('-')
+              , base.join(base.cons(base.eager1(text.letter)))
             )
           , function(name) {
                 return {
-                    type: ARG_TYPE.FLAG
+                    type: OPT_TYPE.SHORT
                   , name: name
-                }
-          }
+                };
+            }
         )
     )
 ), parse.many(text.space));
@@ -121,7 +121,7 @@ var argument = parse.choice(
   , maybeOptionalArg(parse.attempt(positionalArg))
 );
 
-module.exports.ARG_TYPE = ARG_TYPE;
+module.exports.OPT_TYPE = OPT_TYPE;
 module.exports.ARGNAME = ARGNAME;
 module.exports.argname = argname;
 module.exports._argname_ = _argname_;
