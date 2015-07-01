@@ -1,0 +1,88 @@
+'use strict';
+
+var _ = require('lodash')
+  , parse = require('bennu').parse
+  , text = require('bennu').text
+  , assert = require('assert')
+  , args = require('../parsers/args')
+;
+
+describe('baseline', function() {
+
+    describe('ARGNAME', function() {
+
+        var valid = [ 'ARGUMENT', 'A', 'ARG-A' ]
+          , invalid = [ '', 'argument', 'aRgUmEnT', 'a', 'arg-A' ];
+
+        it('should parse valid ARGNAMEs', function() {
+            _.each(valid, function(s) {
+                assert.equal(
+                    s
+                  , parse.run(args.ARGNAME, s)
+                );
+            });
+        });
+
+        it('should not parse invalid ARGNAMEs', function() {
+            _.each(invalid, function(s) {
+                assert.throws(
+                    function()  { parse.run(args.ARGNAME, s); }
+                  , function(e) { return e instanceof parse.ParseError; }
+                );
+            });
+        });
+    });
+
+    describe('<argument>', function() {
+
+        var valid   = [ '<argument>', '<a>', '<arg-a>' ]
+          , invalid = [ '', '<A>', '<ARG-a>', '<argument'
+                      , 'argument>', '<-argument>'
+                      , '<ARGUMENT>' ];
+
+        it('should parse valid <argument>s', function() {
+            _.each(valid, function(s) {
+                assert.equal(
+                    s
+                  , parse.run(args._argname_, s)
+                );
+            });
+        });
+
+        it('should not parse invalid <argument>s', function() {
+            _.each(invalid, function(s) {
+                assert.throws(
+                    function()  { parse.run(args._argname_, s); }
+                  , function(e) { return e instanceof parse.ParseError; }
+                );
+            });
+        });
+    });
+
+    context('options', function() {
+        describe('--output=<arg>', function() {
+            it('should be parsed as option `output` with value `arg`', function() {
+                var opt = parse.run(
+                    args.option
+                  , '--output=<arg>'
+                );
+
+                assert.equal(opt.type, args.ARG_TYPE.OPTION);
+                assert.equal(opt.name, 'output');
+                assert.equal(opt.val, '<arg>');
+            });
+        });
+
+        describe('--some-feature', function() {
+            it('should be parsed as flag `some-feature`', function() {
+                var opt = parse.run(
+                    args.option
+                  , '--some-feature'
+                );
+
+                assert.equal(opt.type, args.ARG_TYPE.FLAG);
+                assert.equal(opt.name, 'some-feature');
+            });
+        });
+    });
+});

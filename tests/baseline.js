@@ -4,7 +4,7 @@ var _ = require('lodash')
   , parse = require('bennu').parse
   , text = require('bennu').text
   , assert = require('assert')
-  , base = require('../base')
+  , base = require('../parsers/base')
 ;
 
 describe('string', function() {
@@ -42,10 +42,7 @@ describe('string', function() {
         it('should throw if case does not match', function() {
             assert.throws(
                 function() {
-                    parse.run(
-                        base.string('AbC', true)
-                      , 'abc'
-                    )
+                    parse.run(base.string('AbC', true), 'abc')
                 }
               , function(e) {
                     return (e instanceof parse.ParseError)
@@ -83,24 +80,12 @@ describe('transform', function() {
     });
 });
 
-describe('concatWith', function() {
-    it('should concatenate parse results with the seperator', function() {
+describe('join', function() {
+    it('should join parse results with the seperator', function() {
         assert.equal(
             'a-b-c'
           , parse.run(
-                base.concatWith('-', parse.eager(parse.many(text.letter)))
-              , 'abc'
-            )
-        );
-    });
-});
-
-describe('concat', function() {
-    it('should concatenate parse results', function() {
-        assert.equal(
-            'abc'
-          , parse.run(
-                base.concat(parse.eager(parse.many(text.letter)))
+                base.join('-', parse.eager(parse.many(text.letter)))
               , 'abc'
             )
         );
@@ -154,7 +139,7 @@ describe('cons', function() {
         assert.equal(
             'abc'
           , parse.run(
-                base.concat(base.cons(
+                base.join(base.cons(
                     text.character('a')
                   , text.character('b')
                   , text.character('c')
@@ -170,7 +155,7 @@ describe('repeatedly', function() {
         assert.equal(
             'abc'
           , parse.run(
-                base.concat(base.repeatedly(text.letter))
+                base.join(base.repeatedly(text.letter))
               , 'abc'
             )
         );

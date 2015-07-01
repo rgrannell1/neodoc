@@ -67,7 +67,7 @@ var transform = function(p, f) {
 /**
  * Concatenate the results of a parse.
  *
- * @param {String} sep
+ * @param {String} [sep]
  * The separator to use.
  *
  * @param {Parser} parser
@@ -75,16 +75,19 @@ var transform = function(p, f) {
  *
  * @returns {Parser}
  */
-var concatWith = function(sep, parser) {
+var join = function(sep, parser) {
+
+    if (typeof sep !== 'string') {
+        parser = sep;
+        sep = '';
+    }
+
     return transform(parser, function(xs) {
         return _.isArray(xs)
           ? xs.join(sep)
           : xs;
     });
 };
-
-/* @see concatWith */
-var concat = _.partial(concatWith, '');
 
 /**
  * Consume a repeating parser `parser` eagerly.
@@ -126,6 +129,7 @@ var cons = function() {
     return _.foldl(_.toArray(arguments), function(acc, parser) {
         return acc.chain(function(accout) {
             return parser.chain(function(parserout) {
+                accout = _.isArray(accout) ? accout : [ accout ];
                 return parse.of(accout.concat([ parserout ]));
             });
         });
@@ -157,8 +161,7 @@ module.exports.string = string;
 module.exports.string.Casing = Casing;
 module.exports.space = space;
 module.exports.transform = transform;
-module.exports.concatWith = concatWith;
-module.exports.concat = concat;
+module.exports.join = join;
 module.exports.eager = eager;
 module.exports.eager1 = eager1;
 module.exports.cons = cons;
