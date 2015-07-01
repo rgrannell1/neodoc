@@ -85,6 +85,18 @@ describe('baseline', function() {
             });
         });
 
+        describe('-f', function() {
+            it('should be parsed as stacked flag `-f`', function() {
+                var opt = parse.run(
+                    args.option
+                  , '-f'
+                );
+
+                assert.equal(opt.type, args.OPT_TYPE.SHORT);
+                assert.equal(opt.name, 'f');
+            });
+        });
+
         describe('-fFILE', function() {
             it('should be parsed as stacked flags `-f -F -I -L -E`', function() {
                 var opt = parse.run(

@@ -47,6 +47,48 @@ var _argname_ = base.join(base.cons(
  */
 var positionalArg = parse.either(ARGNAME, _argname_);
 
+var longOption =
+        base.transform(
+            base.cons(
+                parse.next(text.string('--'), argname)
+              , parse.optional(null, parse.next(text.string('='), _argname_))
+            )
+          , _.spread(function(name, arg) {
+                return {
+                    type: OPT_TYPE.LONG
+                  , name: name
+                  , arg:  arg
+                };
+            })
+        );
+
+var shortOptionSingle =
+    base.transform(
+        lang.then(
+            parse.next(text.character('-'), text.letter)
+          , parse.not(text.letter)
+        )
+      , function(name) {
+            return {
+                type: OPT_TYPE.SHORT
+              , name: name
+            };
+        }
+    );
+
+var shortOptionStacked =
+    base.transform(
+        parse.next(
+            text.character('-')
+          , base.join(base.cons(base.eager1(text.letter))))
+      , function(name) {
+            return {
+                type: OPT_TYPE.SHORT
+              , name: name
+            };
+        }
+    );
+
 /**
  * Parse a single option, i.e.:
  *     --output=<file>, --some-feature
@@ -57,46 +99,11 @@ var positionalArg = parse.either(ARGNAME, _argname_);
  *     --output FILE -> [ --output, FILE ]
  *     -abc FILE     -> [ -abc,     FILE ]
  */
-var option = lang.then(parse.choice(
-    parse.attempt(
-        base.transform(
-            base.cons(
-                parse.next(
-                    text.string('--')
-                  , argname
-                )
-              , parse.optional(
-                    null
-                  , parse.next(
-                        text.string('=')
-                      , _argname_
-                    )
-                )
-            )
-          , _.spread(function(name, arg) {
-                return {
-                    type: OPT_TYPE.LONG
-                  , name: name
-                  , arg:  arg
-                };
-            })
-        )
-    )
-  , parse.attempt(
-        base.transform(
-            parse.next(
-                text.character('-')
-              , base.join(base.cons(base.eager1(text.letter)))
-            )
-          , function(name) {
-                return {
-                    type: OPT_TYPE.SHORT
-                  , name: name
-                };
-            }
-        )
-    )
-), parse.many(text.space));
+var option = parse.choice(
+    parse.attempt(longOption)
+  , parse.attempt(shortOptionSingle)
+  , parse.attempt(shortOptionStacked)
+);
 
 
 var maybeOptionalArg = function(parser) {
@@ -129,3 +136,6 @@ module.exports.positionalArg = positionalArg;
 module.exports.option = option;
 module.exports.maybeOptionalArg = maybeOptionalArg;
 module.exports.argument = argument;
+module.exports.longOption = longOption;
+module.exports.shortOptionStacked = shortOptionStacked;
+module.exports.shortOptionSingle = shortOptionSingle;

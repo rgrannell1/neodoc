@@ -9,42 +9,43 @@ var _ = require('lodash')
 ;
 
 var TYPE = {
-    GROUP: 'GROUP'
+    REQUIRED: 'REQUIRED'
+  , OPTIONAL: 'OPTIONAL'
 };
 
 var group = parse.rec(function(self) {
-    return base.transform(
-        lang.between(
-            text.character('(')
-          , text.character(')')
-          , base.$(
-                parse.eager(
-                    lang.sepBy1(
-                        base.$(text.character('|'))
-                      , parse.eager(parse.many1(base.$(
-                            parse.either(
-                                parse.attempt(self)
-                              , args.option
-                            )
-                        )))
+        return base.transform(
+            lang.between(
+                text.character(open)
+              , text.character(close)
+              , base.$(
+                    parse.eager(
+                        lang.sepBy1(
+                            base.$(text.character('|'))
+                          , parse.eager(parse.many1(base.$(
+                                parse.choice(
+                                    parse.attempt(self)
+                                  , args.option
+                                  , other
+                                )
+                            )))
+                        )
                     )
-                  , function(subnodes) {
-                        return {
-                            TYPE: 'SUBGROUP'
-                          , nodes: subnodes
-                        };
-                    }
                 )
             )
-        )
-      , function(children) {
-            return {
-                TYPE:    'GROUP'
-              , children: children
+          , function(elements) {
+                return {
+                    TYPE:    type
+                  , elements: elements
+                }
             }
-        }
-    )
-});
+        );
+    });
+};
+
+var optional = group;
+var required = group;
 
 module.exports.TYPE = TYPE;
-module.exports.group = group;
+module.exports.required = required;
+module.exports.optional = optional;
