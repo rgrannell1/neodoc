@@ -50,10 +50,15 @@ var positionalArg = parse.either(ARGNAME, _argname_);
 
 /**
  * Parse a single option, i.e.:
- *     --output=<arg>
- *     --some-flag
+ *     --output=<file>
+ *     --some-feature
  *     -s
  *     -abc
+ *
+ * Parse ambiguos matches, resolve later:
+ *     --output FILE
+ *     -s FILE
+ *     -abc FILE
  */
 var option = lang.then(parse.choice(
     parse.attempt(
