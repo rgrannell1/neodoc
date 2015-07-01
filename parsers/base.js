@@ -129,12 +129,28 @@ var cons = function() {
     return _.foldl(_.toArray(arguments), function(acc, parser) {
         return acc.chain(function(accout) {
             return parser.chain(function(parserout) {
+                // accout = _.isArray(accout) ? accout : [ accout ];
+                return parse.of(accout.concat([ parserout ]));
+            });
+        });
+    }, parse.of([]));
+};
+
+/**
+ * Collect all parsers and run `f`
+ * on them
+ */
+var all = function() {
+    return _.foldl(_.toArray(arguments), function(acc, parser) {
+        return acc.chain(function(accout) {
+            return parser.chain(function(parserout) {
                 accout = _.isArray(accout) ? accout : [ accout ];
                 return parse.of(accout.concat([ parserout ]));
             });
         });
     });
 };
+
 
 /**
  * Runs a parser recursively, collecting
@@ -167,6 +183,22 @@ var $ = function(p) {
     );
 };
 
+/**
+ * Parse a quoted string.
+ *
+ * @param {Char} delim
+ * The character to use for quotes, i.e. `'` or `"`.
+ *
+ * @returns {Parser}
+ */
+var quoted = function(delim) {
+    return join(lang.between(
+        text.character(delim)
+      , text.character(delim)
+      , eager(text.noneOf(delim))
+    ));
+};
+
 module.exports.$ = $;
 module.exports.string = string;
 module.exports.string.Casing = Casing;
@@ -177,3 +209,6 @@ module.exports.eager = eager;
 module.exports.eager1 = eager1;
 module.exports.cons = cons;
 module.exports.repeatedly = repeatedly;
+module.exports.quoted = quoted;
+module.exports.singleQuoted = quoted("'");
+module.exports.doubleQuoted = quoted('"');

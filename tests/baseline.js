@@ -175,3 +175,13 @@ describe('$', function() {
         });
     });
 });
+
+describe('quoted', function() {
+    it('should parse quoted strings', function() {
+        var str = parse.run(
+            base.doubleQuoted
+          , '"foo \'bar\'"'
+        );
+        assert.equal('foo \'bar\'', str);
+    });
+});

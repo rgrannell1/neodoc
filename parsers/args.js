@@ -80,7 +80,7 @@ var shortOptionStacked =
     base.transform(
         parse.next(
             text.character('-')
-          , base.join(base.cons(base.eager1(text.letter))))
+          , base.join(base.eager1(text.letter)))
       , function(name) {
             return {
                 type: OPT_TYPE.SHORT
