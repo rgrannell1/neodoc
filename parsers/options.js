@@ -106,8 +106,10 @@ var description = base.transform(
                                           , text.string(_.repeat(
                                                 ' '
                                               , state.position.index
-                                        ))))
-                                      , function(s) { return s + ' '; }
+                                            ))
+                                          , text.match(/[^\n ]/)
+                                        ))
+                                      , function(s) { return ' ' + s; }
                                     )
                                   , parse.attempt(text.match(/[^\n]/))
                                 )

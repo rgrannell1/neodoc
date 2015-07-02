@@ -180,10 +180,10 @@ describe('options', function() {
             var option = parse.run(
                 options.options
               , '   --foo=<val>  foo bar\n'
-              + '                 qix zuc [default: 100]\n'
+              + '                qix zuc [default: 100]\n'
               + '   --qux=<val>  micro phone\n'
-              + '                 even more\n'
-              // + '    --qux=<val>  lorem'
+              + '                even more\n'
+              + '   --qux=<val>  lorem'
             );
             } catch(e) {
                 console.log(e.toString());
