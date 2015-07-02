@@ -199,6 +199,20 @@ var quoted = function(delim) {
     ));
 };
 
+/**
+ * Fail with message
+ *
+ * @param {String} msg
+ * The error message.
+ *
+ * @returns {Parser}
+ */
+var fail = function(msg) {
+    return parse.getPosition.chain(function(p) {
+        return parse.never(new parse.ParseError(p, msg));
+    });
+};
+
 module.exports.$ = $;
 module.exports.string = string;
 module.exports.string.Casing = Casing;
@@ -210,5 +224,6 @@ module.exports.eager1 = eager1;
 module.exports.cons = cons;
 module.exports.repeatedly = repeatedly;
 module.exports.quoted = quoted;
-module.exports.singleQuoted = quoted("'");
+module.exports.singleQuoted = quoted('\'');
 module.exports.doubleQuoted = quoted('"');
+module.exports.fail = fail;

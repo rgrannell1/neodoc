@@ -129,17 +129,41 @@ describe('options', function() {
     describe('multiple lines', function() {
         it('should parse if aligned', function() {
 
-            try {
             var option = parse.run(
                 options.option
-              , '    --all=<val>  foo bar \n'
-              + '                 qu[default: 100]x'
+              , '    --all=<val>  foo bar [default: 100]\n'
+              + '                 qux '
             );
-            } catch(e) {
-                console.log(e);
-                console.log(e.stack);
-                return;
-            }
+
+            assert.strictEqual(option.flags.length, 1);
+            assert.strictEqual(option.description, 'foo bar qux');
+            assert.strictEqual(option.defaults.length, 1);
+        });
+    });
+
+    describe('multiple lines', function() {
+        it('should parse if aligned', function() {
+
+            var option = parse.run(
+                options.option
+              , '    --all=<val>  foo bar\n'
+              + '                 qux [default: 100]'
+            );
+
+            assert.strictEqual(option.flags.length, 1);
+            assert.strictEqual(option.description, 'foo bar qux');
+            assert.strictEqual(option.defaults.length, 1);
+        });
+    });
+
+    describe('multiple lines', function() {
+        it('should parse if aligned', function() {
+
+            var option = parse.run(
+                options.option
+              , '    --all=<val>  foo [default: 100] bar\n'
+              + '                 qux '
+            );
 
             assert.strictEqual(option.flags.length, 1);
             assert.strictEqual(option.description, 'foo bar qux');
