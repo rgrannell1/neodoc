@@ -24,158 +24,219 @@ var defaults = lang.between(
     )
 );
 
-var option = base.$(parse.getParserState.chain(function(initialState) {
+/*
+ * Parse the leading flags, i.e:
+ * -f, --flag [...]
+ */
+var leadingFlags = parse.getParserState.chain(function(state) {
     return base.transform(
-        base.cons(
-
-            // -----------------------
-            // Parse the leading flags:
-            // -f, --flag [...]
-            // -----------------------
-            base.transform(
-                parse.choice(
-                    parse.attempt(base.cons(
-                        args.shortOptionSingle
-                      , parse.optional(
-                            parse.next(
-                                text.string(', ')
-                              , args.longOption
-                            )
-                        )
-                    ))
-                  , parse.attempt(args.shortOptionSingle)
-                  , parse.attempt(args.longOption)
+        parse.choice(
+            parse.attempt(base.cons(
+                args.shortOptionSingle
+              , parse.optional(
+                    parse.next(
+                        text.string(', ')
+                      , args.longOption
+                    )
                 )
-              , function(x) { return _.isArray(x) ? x : [ x ]; }
-            )
+            ))
+          , parse.attempt(args.shortOptionSingle)
+          , parse.attempt(args.longOption)
+        )
+      , function(x) { return _.isArray(x) ? x : [ x ]; }
+    ).chain(function(out) {
+        return parse.modifyState(function(userState) {
+            return _.assign(userState || {}, {
+                flagStart: state.position.index
+            });
+        }).chain(_.constant(parse.of(out)));
+    });
+});
 
-            // -----------------------------------------------
-            // Parse the description text, including defaults:
-            //
-            // ... lorem ipsum [default: true]
-            //
-            // Note that the description text may span multiple
-            // lines if the the next line starts exactly the first
-            // line's description text started:
-            //
-            // ... lorem ipsum     [default: true]
-            //     brot und spiele
-            // -----------------------------------------------
-          , parse.sequence(
-                base.space
-              , base.space
-              , parse.getParserState.chain(function(descState) {
-                    return base.transform(
-                        parse.rec(function(self) {
-                            return parse.bind(
+/*
+ * Parse the description text, i.e. on of:
+ * ... lorem ipsum [default: true]
+ * ... lorem ipsum     [default: true]
+ *     brot und spiele
+ *     ^ -- index must match!
+ */
+var description = base.transform(
+    parse.sequence(
+        base.space
+      , base.space
+      , parse.getParserState.chain(function(state) {
+            return base.transform(
+                parse.rec(function(self) {
+                    return parse.bind(
+                        parse.choice(
+
+                            // -----------------------------
+                            // Try to parse defaults
+                            // Note: Must be situated at EOL
+                            //       or EOF.
+                            // -----------------------------
+                            parse.attempt(base.transform(
+                                parse.next(
+                                    parse.many1(base.space)
+                                  , lang.then(
+                                        defaults
+                                      , parse.either(
+                                            parse.lookahead(
+                                                text.match(/\n/)
+                                            )
+                                          , parse.eof
+                                        )
+                                    )
+                                )
+                              , function(defs) {
+                                    return [ '', [ defs ] ];
+                                }
+                            ))
+
+                            // ---------------------------------
+                            // Try to parse plain text
+                            // Note: This also parses new-lines
+                            //       if the indentation matches.
+                            // ---------------------------------
+                          , parse.attempt(base.transform(
                                 parse.choice(
-
-                                    // -----------------------------
-                                    // Try to parse defaults
-                                    // Note: Must be situated at EOL
-                                    // -----------------------------
-                                    parse.attempt(base.transform(
-                                        parse.next(
-                                            parse.many1(base.space)
-                                          , lang.then(
-                                                defaults
-                                              , parse.either(
-                                                    text.match(/\n/)
-                                                  , parse.eof
-                                                )
-                                            )
-                                        )
-                                      , function(defs) {
-                                            return [ ' ', [ defs ] ];
-                                        }
-                                    ))
-
-                                    // --------------------------------
-                                    // Try to parse plain text
-                                    // Note: This also parses new-lines
-                                    //       if the indentation matches
-                                    // --------------------------------
-                                  , parse.attempt(base.transform(
-                                        parse.choice(
-                                            base.transform(
-                                                parse.attempt(parse.sequence(
-                                                    text.match(/\n/)
-                                                  , text.string(_.repeat(
-                                                        ' '
-                                                      , descState.position.index
-                                                ))))
-                                              , function(s) { return s + ' '; }
-                                            )
-                                          , parse.attempt(parse.anyToken)
-                                        )
-                                      , function(desc) {
-                                            return [ desc, [] ];
-                                        }
-                                    ))
-
-                                   // -------------------
-                                   // Parse final EOF/EOL
-                                   // -------------------
-                                  , base.transform(
-                                        parse.either(
-                                            parse.eof
-                                          , text.match(/\n/)
-                                        )
-                                      , _.constant([])
+                                    base.transform(
+                                        parse.attempt(parse.sequence(
+                                            text.match(/\n/)
+                                          , text.string(_.repeat(
+                                                ' '
+                                              , state.position.index
+                                        ))))
+                                      , function(s) { return s + ' '; }
                                     )
+                                  , parse.attempt(text.match(/[^\n]/))
                                 )
-                              , _.spread(function(desc, defs) {
-                                    return (desc !== undefined
-                                        || defs  !== undefined
-                                    )
-                                      ? self.chain(_.spread(function(desc1, defs1) {
-                                            return parse.of([
-                                                desc + desc1
-                                              , defs.concat(defs1)
-                                            ]);
-                                        }))
-                                      : parse.of(['', []]);
-                                })
-                            );
-                        })
-                        // -------------------------------
-                        // Sanitize the description string
-                        // -------------------------------
-                        .chain(_.spread(function(desc, defs) {
-                            return (_.contains(desc, '[default:'))
-                              ? base.fail(
-                                    'Unparsed `[default: ...]` found. '
-                                  + 'Defaults should be specified at the '
-                                  + 'end of a line.'
+                              , function(desc) {
+                                    return [ desc, [] ];
+                                }
+                            ))
+
+                           // -------------------
+                           // Parse final EOF/EOL
+                           // -------------------
+                          , parse.look(base.transform(
+                                parse.either(
+                                    text.match(/\n/)
+                                  , parse.eof
                                 )
-                              : parse.of([
-                                    desc.replace(
-                                        _.repeat(' ', descState.position.index)
-                                      , '')
-                                    , defs ]);
-                        }))
+                              , _.constant([])
+                            ))
+                        )
                       , _.spread(function(desc, defs) {
-                            return {
-                                description: desc
-                              , defaults:    defs
-                            };
+                            return (desc !== undefined
+                                || defs  !== undefined
+                            )
+                              ? self.chain(_.spread(function(desc1, defs1) {
+                                    return parse.of([
+                                        desc + desc1
+                                      , defs.concat(defs1)
+                                    ]);
+                                }))
+                              : parse.of(['', []]);
                         })
                     );
                 })
-            )
-        )
-      , _.spread(function(flags, optText) {
-            return {
-                flags:        flags
-              , defaults:     ((optText.defaults && optText.defaults[0]) || null)
-              , description:  optText.description.trim()
-              , initialOffet: initialState.position.index
-            };
+
+                // ---------------------
+                // Sanitize and validate
+                // ---------------------
+                .chain(_.spread(function(desc, defs) {
+                    return (_.contains(desc, '[default:'))
+                      ? base.fail(
+                            'Unparsed `[default: ...]` found. '
+                          + 'Defaults should be specified at the '
+                          + 'end of a line.'
+                        )
+                      : parse.of([
+                            desc.replace(
+                                _.repeat(' ', state.position.index)
+                              , '')
+                            , defs ]);
+                }))
+              , _.spread(function(desc, defs) {
+                    return {
+                        description: desc
+                      , defaults:    defs
+                    };
+                })
+            ).chain(function(out) {
+                return parse.modifyState(function(userState) {
+                    return _.assign(userState || {}, {
+                        descriptionStart: state.position.index
+                    });
+                }).chain(_.constant(parse.of(out)));
+            });
         })
-    );
+    )
+  , function(desc) {
+        return {
+            defaults:     ((desc.defaults && desc.defaults[0]) || null)
+          , description:  desc.description.trim()
+        };
+    }
+);
+
+/*
+ * Parse a single option block, i.e. on of:
+ *
+ * -f, --flag  Some Description text
+ * -f, --flag  Some Description text [default: 100]
+ * -f          Some Description text
+ * --flag      Some Description text [default: 100]
+ * -f, --flag  Some Description text
+ *             and more text. [default: 100]
+ */
+var option = base.$(base.cons(
+    parse.getParserState
+  , parse.getState
+)).chain(_.spread(function(state, userState) {
+    return (userState
+        && userState.flagStart
+        && userState.flagStart != state.position.index)
+      ? base.fail(
+            'Flag start not aligned! '
+          + 'Expected leading white space of `'
+          + (userState.flagStart)
+          + '` spaces'
+        )
+      : base.transform(
+            base.cons(
+                leadingFlags
+              , description
+            )
+          , _.spread(function(flags, optText) {
+                return {
+                    flags:        flags
+                  , defaults:     optText.defaults
+                  , description:  optText.description
+                  , initialOffet: state.position.index
+                };
+            })
+        );
 }));
 
 var options = parse.rec(function(self) {
+    return parse.either(parse.attempt(
+        option.chain(function(o) {
+            return parse.choice(
+                parse.next(
+                    parse.many(text.match(/\n/))
+                  , parse.setPosition(new parse.Position(0))
+                        .chain(_.constant(self.chain(function(os) {
+                            return parse.of(
+                                ([ o ]).concat(os)
+                            );
+                        })))
+                )
+              , parse.of([ o ])
+            );
+        })
+    ), parse.eof.chain(_.constant(parse.of([]))));
 });
 
 module.exports.defaults = defaults;

@@ -17,7 +17,7 @@ describe('baseline', function() {
             );
             assert.strictEqual(_.isArray(def), true);
             assert.strictEqual('/Users/my account/', def[0]);
-        })
+        });
     });
 
     describe('[default: \'/Users/my account/\']', function() {
@@ -28,7 +28,7 @@ describe('baseline', function() {
             );
             assert.strictEqual(_.isArray(def), true);
             assert.strictEqual('/Users/my account/', def[0]);
-        })
+        });
     });
 
     describe('[default: /root]', function() {
@@ -39,7 +39,7 @@ describe('baseline', function() {
             );
             assert.strictEqual(_.isArray(def), true);
             assert.strictEqual('/root', def[0]);
-        })
+        });
     });
 
     describe('[default: /root /dev]', function() {
@@ -51,11 +51,11 @@ describe('baseline', function() {
             assert.strictEqual(_.isArray(def), true);
             assert.strictEqual('/root', def[0]);
             assert.strictEqual('/dev', def[1]);
-        })
+        });
     });
 });
 
-describe('options', function() {
+describe('single option block', function() {
 
     describe('-a All.', function() {
         it('should not parse - 2 spaces required', function() {
@@ -170,5 +170,26 @@ describe('options', function() {
             );
         });
     });
+});
 
+describe('options', function() {
+    describe('multiple options', function() {
+        it('should parse', function() {
+
+            try{
+            var option = parse.run(
+                options.options
+              , '   --foo=<val>  foo bar\n'
+              + '                 qix zuc [default: 100]\n'
+              + '   --qux=<val>  micro phone\n'
+              + '                 even more\n'
+              // + '    --qux=<val>  lorem'
+            );
+            } catch(e) {
+                console.log(e.toString());
+            }
+
+            console.log(option);
+        });
+    });
 });
