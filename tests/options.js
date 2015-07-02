@@ -5,6 +5,7 @@ var _ = require('lodash')
   , text = require('bennu').text
   , assert = require('assert')
   , options = require('../parsers/options')
+  , docopt = require('../docopt')
 ;
 
 /**
@@ -352,5 +353,18 @@ describe('multiple options', function() {
                 }
             )
         });
+    });
+
+    it('should parse the docopt example options', function() {
+        parse.run(
+            options.options
+          , docopt.mstr('\
+                 -h --help     Show this screen.                             \n\
+                 --version     Show version.                                 \n\
+                 --speed=<kn>  Speed in knots [default: 10]                  \n\
+                 --moored      Moored (anchored) mine.                       \n\
+                 --drifting    Drifting mine.                                \n\
+            ')
+        );
     });
 });
