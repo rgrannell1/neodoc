@@ -41,12 +41,17 @@ var _argname_ = base.join(base.cons(
 ));
 
 /**
- * Parses an argument, either:
+ * Parse an argument, either:
  *
  * `ARGUMENT` or `<argument>`
  */
 var positionalArg = parse.either(ARGNAME, _argname_);
 
+/**
+ * Parse a long option, either:
+ *
+ * `--option` or `--option=<arg>`
+ */
 var longOption =
         base.transform(
             base.cons(
@@ -62,6 +67,9 @@ var longOption =
             })
         );
 
+/**
+ * Parse a short unstacked option: `-f`
+ */
 var shortOptionSingle =
     base.transform(
         lang.then(
@@ -76,6 +84,9 @@ var shortOptionSingle =
         }
     );
 
+/**
+ * Parse a short unstacked option, e.g.: `-fabc`
+ */
 var shortOptionStacked =
     base.transform(
         parse.next(
@@ -114,15 +125,25 @@ var maybeOptionalArg = function(parser) {
               , text.character(']')
               , parser
             )
-          , function(name) { return { arg: name, optional: true } }
+          , function(name) { return {
+                arg:      name
+              , optional: true
+            }; }
         )
       , base.transform(
             parser
-          , function(name) { return { arg: name, optional: false } }
+          , function(name) { return {
+                arg:      name
+              , optional: false
+            }; }
         )
-    )
+    );
 };
 
+/**
+ * Parse an argument, either positional
+ * or not.
+ */
 var argument = parse.choice(
     maybeOptionalArg(parse.attempt(option))
   , maybeOptionalArg(parse.attempt(positionalArg))

@@ -5,7 +5,7 @@ var _ = require('lodash')
   , lang = require('bennu').lang
   , text = require('bennu').text
   , base = require('./base')
-  , args = require('./args')
+  , args = require('./arguments')
 ;
 
 var TYPE = {
