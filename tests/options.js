@@ -176,20 +176,21 @@ describe('options', function() {
     describe('multiple options', function() {
         it('should parse', function() {
 
-            try{
-            var option = parse.run(
+            var opts = parse.run(
                 options.options
-              , '   --foo=<val>  foo bar\n'
-              + '                qix zuc [default: 100]\n'
-              + '   --qux=<val>  micro phone\n'
-              + '                even more\n'
-              + '   --qux=<val>  lorem'
+              , ' --foo=<val>      foo bar\n'
+              + '                  qix zuc [default: 100 "salad"]\n'
+              + ' --qux=<val>      micro phone\n'
+              + '                  even more\n'
+              + ' -b, --bar=<val>  lorem'
             );
-            } catch(e) {
-                console.log(e.toString());
-            }
 
-            console.log(option);
+            assert.strictEqual(opts.length, 3);
+            assert.strictEqual(opts[0].flags.length, 1);
+            assert.strictEqual(opts[0].defaults[0], '100');
+            assert.strictEqual(opts[0].defaults[1], 'salad');
+            assert.strictEqual(opts[1].flags.length, 1);
+            assert.strictEqual(opts[2].flags.length, 2);
         });
     });
 });
