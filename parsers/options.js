@@ -64,6 +64,7 @@ var description = base.transform(
     parse.sequence(
         base.space
       , base.space
+      , parse.many(base.space)
       , parse.getParserState.chain(function(state) {
             return base.transform(
                 parse.rec(function(self) {
@@ -222,6 +223,18 @@ var option = base.$(base.cons(
         );
 }));
 
+/*
+ * Parse multiple options.
+ *
+ * -f, --flag  Some Description text [default: 100]
+ *             which is continued here
+ * -a, --all   Some Description text [default: 100]
+ *
+ * Note: The parser's position is artificially
+ *       reset for each option block in order
+ *       to ensure correct indentation (This
+ *       may need addressing later).
+ */
 var options = parse.rec(function(self) {
     return parse.either(parse.attempt(
         option.chain(function(o) {
