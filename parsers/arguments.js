@@ -56,7 +56,10 @@ var longOption =
         base.transform(
             base.cons(
                 parse.next(text.string('--'), argname)
-              , parse.optional(null, parse.next(text.string('='), _argname_))
+              , parse.optional(parse.choice(
+                    parse.attempt(parse.next(text.string('='), _argname_))
+                  , parse.attempt(parse.next(text.string(' '), ARGNAME))
+                ))
             )
           , _.spread(function(name, arg) {
                 return {
@@ -72,16 +75,21 @@ var longOption =
  */
 var shortOptionSingle =
     base.transform(
-        lang.then(
-            parse.next(text.character('-'), text.letter)
-          , parse.not(text.letter)
+        base.cons(
+            lang.then(
+                parse.next(text.character('-'), text.letter)
+              , parse.not(text.letter)
+            )
+          , parse.optional(parse.attempt(
+                parse.next(text.string(' '), ARGNAME)))
         )
-      , function(name) {
+      , _.spread(function(name, arg) {
             return {
                 type: OPT_TYPE.SHORT
               , name: name
+              , arg:  arg
             };
-        }
+        })
     );
 
 /**
@@ -89,15 +97,20 @@ var shortOptionSingle =
  */
 var shortOptionStacked =
     base.transform(
-        parse.next(
-            text.character('-')
-          , base.join(base.eager1(text.letter)))
-      , function(name) {
+        base.cons(
+            parse.next(
+                text.character('-')
+              , base.join(base.eager1(text.letter)))
+          , parse.optional(parse.attempt(
+                parse.next(text.string(' '), ARGNAME)))
+        )
+      , _.spread(function(name, arg) {
             return {
                 type: OPT_TYPE.SHORT
               , name: name
+              , arg:  arg
             };
-        }
+        })
     );
 
 /**

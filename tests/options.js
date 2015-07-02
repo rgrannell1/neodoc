@@ -81,15 +81,23 @@ describe('single option block', function() {
                 options.option
               , '-a  All.'
             );
+
+            assert.equal(option.flags.length, 1);
+            assert.equal(option.flags[0].name, 'a');
         });
     });
 
     describe('-a, --all  All.', function() {
         it('should parse', function() {
+
             var option = parse.run(
                 options.option
               , '-a, --all  All.'
             );
+
+            assert.equal(option.flags.length, 2);
+            assert.equal(option.flags[0].name, 'a');
+            assert.equal(option.flags[1].name, 'all');
         });
     });
 
@@ -99,6 +107,22 @@ describe('single option block', function() {
                 options.option
               , '--all  All.'
             );
+
+            assert.equal(option.flags.length, 1);
+            assert.equal(option.flags[0].name, 'all');
+        });
+    });
+
+    describe('--all ALL  All.', function() {
+        it('should parse', function() {
+            var option = parse.run(
+                options.option
+              , '--all ALL  All.'
+            );
+
+            assert.equal(option.flags.length, 1);
+            assert.equal(option.flags[0].name, 'all');
+            assert.equal(option.flags[0].arg,  'ALL');
         });
     });
 
@@ -108,6 +132,10 @@ describe('single option block', function() {
                 options.option
               , '--all=<val>  All.'
             );
+
+            assert.equal(option.flags.length, 1);
+            assert.equal(option.flags[0].name, 'all');
+            assert.equal(option.flags[0].arg,  '<val>');
         });
     });
 

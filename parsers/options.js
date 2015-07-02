@@ -42,13 +42,8 @@ var leadingFlags = parse.getParserState.chain(function(state) {
         parse.choice(
             parse.attempt(base.cons(
                 args.shortOptionSingle
-              , parse.optional(
-                    parse.next(
-                        text.string(', ')
-                      , args.longOption
-                    )
-                )
-            ))
+              , parse.next(text.string(', '), args.longOption)
+           ))
           , parse.attempt(args.shortOptionSingle)
           , parse.attempt(args.longOption)
         )
@@ -263,6 +258,18 @@ var options = parse.rec(function(self) {
     ), parse.eof.chain(_.constant(parse.of([]))));
 });
 
+/**
+ * Validate a parsed options block.
+ *
+ * @param {Options} opts
+ * The parsed options block as returned by
+ * running the `options` parser.
+ */
+var validate = function(opts) {
+
+};
+
 module.exports.defaults = defaults;
 module.exports.option = option;
 module.exports.options = options;
+module.exports.validate = validate;
