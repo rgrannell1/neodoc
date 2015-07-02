@@ -73,6 +73,19 @@ describe('baseline', function() {
             });
         });
 
+        describe('--output <arg>', function() {
+            it('should be parsed as option `output` with value `arg`', function() {
+                var opt = parse.run(
+                    args.option
+                  , '--output <arg>'
+                );
+
+                assert.equal(opt.type, args.OPT_TYPE.LONG);
+                assert.equal(opt.name, 'output');
+                assert.equal(opt.arg, '<arg>');
+            });
+        });
+
         describe('--some-feature', function() {
             it('should be parsed as flag `some-feature`', function() {
                 var opt = parse.run(

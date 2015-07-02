@@ -7,7 +7,7 @@ var _ = require('lodash')
   , options = require('../parsers/options')
 ;
 
-describe('baseline', function() {
+describe('defaults', function() {
 
     describe('[default: "/Users/my account/"]', function() {
         it('should parse "/Users/my account/"', function() {
@@ -84,6 +84,40 @@ describe('single option block', function() {
 
             assert.equal(option.flags.length, 1);
             assert.equal(option.flags[0].name, 'a');
+        });
+    });
+
+    describe('-a, --all  All.', function() {
+        it('should parse', function() {
+
+            var option = parse.run(
+                options.option
+              , '-a, --all  All.'
+            );
+
+            assert.equal(option.flags.length, 2);
+            assert.equal(option.flags[0].name, 'a');
+            assert.equal(option.flags[1].name, 'all');
+        });
+    });
+
+    describe('-f <file>, --file  <file>  All.', function() {
+        it('should parse', function() {
+
+            try{
+            var option = parse.run(
+                options.option
+              , '-f <file>, --file <file>  All.'
+            );
+            } catch(e) {
+                return console.log(e);
+            }
+
+            assert.equal(option.flags.length, 2);
+            assert.equal(option.flags[0].name, 'f');
+            assert.equal(option.flags[0].arg, '<file>');
+            assert.equal(option.flags[1].name, 'file');
+            assert.equal(option.flags[1].arg, '<file>');
         });
     });
 
@@ -184,8 +218,8 @@ describe('single option block', function() {
         });
     });
 
-    describe('[default] should throw if not at EOL', function() {
-        it('should parse if aligned', function() {
+    describe('[default] not at EOL', function() {
+        it('should throw', function() {
             // TODO: Restrict exception type.
             assert.throws(
                 function() {

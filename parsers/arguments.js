@@ -53,22 +53,28 @@ var positionalArg = parse.either(ARGNAME, _argname_);
  * `--option` or `--option=<arg>`
  */
 var longOption =
-        base.transform(
-            base.cons(
-                parse.next(text.string('--'), argname)
-              , parse.optional(parse.choice(
-                    parse.attempt(parse.next(text.string('='), _argname_))
-                  , parse.attempt(parse.next(text.string(' '), ARGNAME))
-                ))
-            )
-          , _.spread(function(name, arg) {
-                return {
-                    type: OPT_TYPE.LONG
-                  , name: name
-                  , arg:  arg
-                };
-            })
-        );
+    base.transform(
+        base.cons(
+            parse.next(text.string('--'), argname)
+          , parse.optional(parse.choice(
+                parse.attempt(parse.next(text.string('=')
+                  , parse.either(
+                        parse.attempt(_argname_)
+                      , parse.attempt(ARGNAME))))
+              , parse.attempt(parse.next(text.string(' ')
+                  , parse.either(
+                        parse.attempt(_argname_)
+                      , parse.attempt(ARGNAME))))
+            ))
+        )
+      , _.spread(function(name, arg) {
+            return {
+                type: OPT_TYPE.LONG
+              , name: name
+              , arg:  arg
+            };
+        })
+    );
 
 /**
  * Parse a short unstacked option: `-f`
@@ -81,7 +87,9 @@ var shortOptionSingle =
               , parse.not(text.letter)
             )
           , parse.optional(parse.attempt(
-                parse.next(text.string(' '), ARGNAME)))
+                parse.next(text.string(' '), parse.either(
+                    parse.attempt(_argname_)
+                  , parse.attempt(ARGNAME)))))
         )
       , _.spread(function(name, arg) {
             return {
@@ -102,7 +110,10 @@ var shortOptionStacked =
                 text.character('-')
               , base.join(base.eager1(text.letter)))
           , parse.optional(parse.attempt(
-                parse.next(text.string(' '), ARGNAME)))
+                parse.next(text.string(' '), parse.either(
+                    parse.attempt(_argname_)
+                  , parse.attempt(ARGNAME)
+                ))))
         )
       , _.spread(function(name, arg) {
             return {
