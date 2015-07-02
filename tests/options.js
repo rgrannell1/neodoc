@@ -147,7 +147,7 @@ describe('options', function() {
             var option = parse.run(
                 options.option
               , '    --all=<val>  foo bar\n'
-              + '                 qux [default: 100]'
+              + '                 qux    [default: 100]'
             );
 
             assert.strictEqual(option.flags.length, 1);
@@ -156,18 +156,18 @@ describe('options', function() {
         });
     });
 
-    describe('multiple lines', function() {
+    describe('[default] should throw if not at EOL', function() {
         it('should parse if aligned', function() {
-
-            var option = parse.run(
-                options.option
-              , '    --all=<val>  foo [default: 100] bar\n'
-              + '                 qux '
+            // TODO: Restrict exception type.
+            assert.throws(
+                function() {
+                    parse.run(
+                        options.option
+                      , '    --all=<val>  foo [default: 100] bar\n'
+                      + '                 qux '
+                    );
+                }
             );
-
-            assert.strictEqual(option.flags.length, 1);
-            assert.strictEqual(option.description, 'foo bar qux');
-            assert.strictEqual(option.defaults.length, 1);
         });
     });
 

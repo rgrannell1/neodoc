@@ -90,9 +90,11 @@ var option = base.$(parse.getParserState.chain(function(initialState) {
                                         }
                                     ))
 
-                                    // -----------------------
+                                    // --------------------------------
                                     // Try to parse plain text
-                                    // -----------------------
+                                    // Note: This also parses new-lines
+                                    //       if the indentation matches
+                                    // --------------------------------
                                   , parse.attempt(base.transform(
                                         parse.choice(
                                             base.transform(
@@ -111,16 +113,16 @@ var option = base.$(parse.getParserState.chain(function(initialState) {
                                         }
                                     ))
 
-                                   // -------------
-                                   // Parse EOF/EOL
-                                   // -------------
-                                 , base.transform(
-                                       parse.either(
-                                           parse.eof
-                                         , text.match(/\n/)
-                                       )
-                                     , _.constant([])
-                                   )
+                                   // -------------------
+                                   // Parse final EOF/EOL
+                                   // -------------------
+                                  , base.transform(
+                                        parse.either(
+                                            parse.eof
+                                          , text.match(/\n/)
+                                        )
+                                      , _.constant([])
+                                    )
                                 )
                               , _.spread(function(desc, defs) {
                                     return (desc !== undefined
