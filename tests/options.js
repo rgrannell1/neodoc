@@ -234,8 +234,8 @@ describe('single option block', function() {
     });
 });
 
-describe('options', function() {
-    describe('multiple options', function() {
+describe('multiple options', function() {
+    describe('that are aligned correctly', function() {
         it('should parse', function() {
 
             var opts = parse.run(
@@ -253,6 +253,76 @@ describe('options', function() {
             assert.strictEqual(opts[0].defaults[1], 'salad');
             assert.strictEqual(opts[1].flags.length, 1);
             assert.strictEqual(opts[2].flags.length, 2);
+        });
+    });
+
+    describe('that have misaligned flags', function() {
+        it('should throw', function() {
+            assert.throws(
+                function() {
+                    parse.run(
+                        options.options
+                    , ' --foo=<val>      foo bar\n'
+                    + '                  qix zuc [default: 100 "salad"]\n'
+                    + '   --qux=<val>      micro phone\n'
+                    + '                  even more\n'
+                    + ' -b, --bar=<val>  lorem'
+                    );
+                }
+              , function(e) { return e instanceof parse.ParseError; }
+            )
+        });
+    });
+
+    describe('that have misaligned descriptions', function() {
+        it('should throw if over-dented', function() {
+            assert.throws(
+                function() {
+                    parse.run(
+                        options.options
+                    , ' --foo=<val>  foo bar\n'
+                    + '                 qix zuc\n'
+                    );
+                }
+              , function(e) { return e instanceof parse.ParseError; }
+            )
+        });
+
+        it('should throw if under-dented', function() {
+            assert.throws(
+                function() {
+                    parse.run(
+                        options.options
+                    , ' --foo=<val>  foo bar\n'
+                    + '            qix zuc\n'
+                    );
+                }
+              , function(e) { return e instanceof parse.ParseError; }
+            )
+        });
+
+        it('should throw if different from first block (under)', function() {
+            assert.throws(
+                function() {
+                    parse.run(
+                        options.options
+                    , ' --foo=<val>    foo bar\n'
+                    + ' --bar=<xyz>  qix zuc\n'
+                    );
+                }
+            )
+        });
+
+        it('should throw if different from first block (over)', function() {
+            assert.throws(
+                function() {
+                    parse.run(
+                        options.options
+                    , ' --foo=<val>  foo bar\n'
+                    + ' --bar=<xyz>    qix zuc\n'
+                    );
+                }
+            )
         });
     });
 });

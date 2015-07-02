@@ -4,7 +4,7 @@ var _ = require('lodash')
   , parse = require('bennu').parse
   , text = require('bennu').text
   , assert = require('assert')
-  , args = require('../parsers/args')
+  , args = require('../parsers/arguments')
 ;
 
 describe('baseline', function() {
