@@ -56,6 +56,7 @@ describe('baseline', function() {
 });
 
 describe('options', function() {
+
     describe('-a All.', function() {
         it('should not parse - 2 spaces required', function() {
             assert.throws(
@@ -112,15 +113,38 @@ describe('options', function() {
 
     describe('--all=<val>  All [default: true]', function() {
         it('should parse', function() {
+
             var option = parse.run(
                 options.option
               , '--all=<val>  All [default: true]'
             );
 
             assert.strictEqual(option.flags.length, 1);
-            assert.strictEqual(option.description.trim(), 'All');
+            assert.strictEqual(option.description, 'All');
             assert.strictEqual(option.defaults.length, 1);
             assert.strictEqual(option.defaults[0], 'true');
         });
     });
+
+    describe('multiple lines', function() {
+        it('should parse if aligned', function() {
+
+            try {
+            var option = parse.run(
+                options.option
+              , '    --all=<val>  foo bar \n'
+              + '                 qu[default: 100]x'
+            );
+            } catch(e) {
+                console.log(e);
+                console.log(e.stack);
+                return;
+            }
+
+            assert.strictEqual(option.flags.length, 1);
+            assert.strictEqual(option.description, 'foo bar qux');
+            assert.strictEqual(option.defaults.length, 1);
+        });
+    });
+
 });
