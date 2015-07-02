@@ -7,6 +7,20 @@ var _ = require('lodash')
   , options = require('../parsers/options')
 ;
 
+/**
+ * Tests confirming the correct behavior of the `Options` block
+ * parsers, i.e.:
+ *
+ * Options:
+ *
+ *Options:
+ *  -h --help     Show this screen.
+ *  --version     Show version.
+ *  --speed=<kn>  Speed in knots [default: 10].
+ *  --moored      Moored (anchored) mine.
+ *  --drifting    Drifting mine.
+ */
+
 describe('defaults', function() {
 
     describe('[default: "/Users/my account/"]', function() {
@@ -127,6 +141,20 @@ describe('single option block', function() {
             var option = parse.run(
                 options.option
               , '-a, --all  All.'
+            );
+
+            assert.equal(option.flags.length, 2);
+            assert.equal(option.flags[0].name, 'a');
+            assert.equal(option.flags[1].name, 'all');
+        });
+    });
+
+    describe('-a --all  All.', function() {
+        it('should parse', function() {
+
+            var option = parse.run(
+                options.option
+              , '-a --all  All.'
             );
 
             assert.equal(option.flags.length, 2);

@@ -42,7 +42,11 @@ var leadingFlags = parse.getParserState.chain(function(state) {
         parse.choice(
             parse.attempt(base.cons(
                 args.shortOptionSingle
-              , parse.next(text.string(', '), args.longOption)
+              , parse.next(
+                  parse.either(
+                      text.string(', ')
+                    , text.string(' '))
+                , args.longOption)
            ))
           , parse.attempt(args.shortOptionSingle)
           , parse.attempt(args.longOption)
