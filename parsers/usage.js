@@ -6,6 +6,7 @@ var _ = require('lodash')
   , assert = require('assert')
   , base = require('./base')
   , args = require('./arguments')
+  , structs = require('./structures')
 ;
 
 var line = function(program) {
@@ -14,7 +15,10 @@ var line = function(program) {
       , parse.eager(parse.many(
             parse.next(
                 parse.many(base.space)
-              , args.argument
+              , parse.either(
+                    parse.attempt(args.argument)
+                  , structs.group
+                )
             )
         ))
     )

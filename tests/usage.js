@@ -33,8 +33,10 @@ describe('defaults', function() {
 
             assert.strictEqual(line[0].type, args.OPT_TYPE.COMMAND);
             assert.strictEqual(line[0].name, 'ship');
+
             assert.strictEqual(line[1].type, args.OPT_TYPE.COMMAND);
             assert.strictEqual(line[1].name, 'new');
+
             assert.strictEqual(line[2].type, args.OPT_TYPE.POSITIONAL);
             assert.strictEqual(line[2].name, '<name>');
             assert.strictEqual(line[2].modifiers.optional, false);
@@ -78,6 +80,24 @@ describe('defaults', function() {
             assert.strictEqual(line[5].arg, "<kn>");
             assert.strictEqual(line[5].modifiers.repeating, false);
             assert.strictEqual(line[5].modifiers.optional, true);
+        });
+    });
+
+    describe('naval_fate mine (set|remove) <x> <y> [--moored|--drifting]', function() {
+        it('should parse', function() {
+
+            try{
+            var line = parse.run(
+                usage.line('naval_fate')
+              , 'naval_fate mine (set|remove) <x> <y>'// [--moored|--drifting]'
+            );
+            } catch(e) {
+                console.log(e.toString());
+                // return console.log(e.stack);
+                return;
+            }
+
+            console.log(line);
         });
     });
 });

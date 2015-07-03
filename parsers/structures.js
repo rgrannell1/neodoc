@@ -8,16 +8,11 @@ var _ = require('lodash')
   , args = require('./arguments')
 ;
 
-var TYPE = {
-    REQUIRED: 'REQUIRED'
-  , OPTIONAL: 'OPTIONAL'
-};
-
 var group = parse.rec(function(self) {
         return base.transform(
             lang.between(
-                text.character(open)
-              , text.character(close)
+                text.character('(')
+              , text.character(')')
               , base.$(
                     parse.eager(
                         lang.sepBy1(
@@ -25,27 +20,20 @@ var group = parse.rec(function(self) {
                           , parse.eager(parse.many1(base.$(
                                 parse.choice(
                                     parse.attempt(self)
-                                  , args.option
-                                  , other
+                                  , args.argument
                                 )
                             )))
                         )
                     )
                 )
             )
-          , function(elements) {
+          , function(args) {
                 return {
-                    TYPE:    type
-                  , elements: elements
+                    TYPE: 'MUTEX'
+                  , args: args
                 }
             }
         );
     });
-};
 
-var optional = group;
-var required = group;
-
-module.exports.TYPE = TYPE;
-module.exports.required = required;
-module.exports.optional = optional;
+module.exports.group = group;
