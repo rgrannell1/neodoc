@@ -10,12 +10,7 @@ var _ = require('lodash')
 var line = function(program) {
     return parse.next(
         text.string(program)
-      , parse.eager(parse.many(
-            parse.next(
-                parse.many(base.space)
-              , args.argument
-            )
-        ))
+      , args.group
     );
 };
 

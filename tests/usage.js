@@ -31,16 +31,16 @@ describe('defaults', function() {
               , 'naval_fate ship new <name>...'
             );
 
-            assert.strictEqual(line[0].type, args.OPT_TYPE.COMMAND);
-            assert.strictEqual(line[0].name, 'ship');
+            assert.strictEqual(line[0][0].type, args.OPT_TYPE.COMMAND);
+            assert.strictEqual(line[0][0].name, 'ship');
 
-            assert.strictEqual(line[1].type, args.OPT_TYPE.COMMAND);
-            assert.strictEqual(line[1].name, 'new');
+            assert.strictEqual(line[0][1].type, args.OPT_TYPE.COMMAND);
+            assert.strictEqual(line[0][1].name, 'new');
 
-            assert.strictEqual(line[2].type, args.OPT_TYPE.POSITIONAL);
-            assert.strictEqual(line[2].name, '<name>');
-            assert.strictEqual(line[2].modifiers.optional, false);
-            assert.strictEqual(line[2].modifiers.repeating, true);
+            assert.strictEqual(line[0][2].type, args.OPT_TYPE.POSITIONAL);
+            assert.strictEqual(line[0][2].name, '<name>');
+            assert.strictEqual(line[0][2].modifiers.optional, false);
+            assert.strictEqual(line[0][2].modifiers.repeating, true);
         });
     });
 
@@ -52,61 +52,82 @@ describe('defaults', function() {
               , 'naval_fate ship <name> move <x> <y> [--speed=<kn>]'
             );
 
-            assert.strictEqual(line[0].type, args.OPT_TYPE.COMMAND);
-            assert.strictEqual(line[0].name, "ship");
-            assert.strictEqual(line[0].modifiers.repeating, false);
+            assert.strictEqual(line[0][0].type, args.OPT_TYPE.COMMAND);
+            assert.strictEqual(line[0][0].name, 'ship');
+            assert.strictEqual(line[0][0].modifiers.repeating, false);
 
-            assert.strictEqual(line[1].type, args.OPT_TYPE.POSITIONAL);
-            assert.strictEqual(line[1].name, "<name>");
-            assert.strictEqual(line[1].modifiers.repeating, false);
-            assert.strictEqual(line[1].modifiers.optional, false);
+            assert.strictEqual(line[0][1].type, args.OPT_TYPE.POSITIONAL);
+            assert.strictEqual(line[0][1].name, '<name>');
+            assert.strictEqual(line[0][1].modifiers.repeating, false);
+            assert.strictEqual(line[0][1].modifiers.optional, false);
 
-            assert.strictEqual(line[2].type, args.OPT_TYPE.COMMAND);
-            assert.strictEqual(line[2].name, "move");
-            assert.strictEqual(line[2].modifiers.repeating, false);
+            assert.strictEqual(line[0][2].type, args.OPT_TYPE.COMMAND);
+            assert.strictEqual(line[0][2].name, 'move');
+            assert.strictEqual(line[0][2].modifiers.repeating, false);
 
-            assert.strictEqual(line[3].type, args.OPT_TYPE.POSITIONAL);
-            assert.strictEqual(line[3].name, "<x>");
-            assert.strictEqual(line[3].modifiers.repeating, false);
-            assert.strictEqual(line[3].modifiers.optional, false);
+            assert.strictEqual(line[0][3].type, args.OPT_TYPE.POSITIONAL);
+            assert.strictEqual(line[0][3].name, '<x>');
+            assert.strictEqual(line[0][3].modifiers.repeating, false);
+            assert.strictEqual(line[0][3].modifiers.optional, false);
 
-            assert.strictEqual(line[4].type, args.OPT_TYPE.POSITIONAL);
-            assert.strictEqual(line[4].name, "<y>");
-            assert.strictEqual(line[4].modifiers.repeating, false);
-            assert.strictEqual(line[4].modifiers.optional, false);
+            assert.strictEqual(line[0][4].type, args.OPT_TYPE.POSITIONAL);
+            assert.strictEqual(line[0][4].name, '<y>');
+            assert.strictEqual(line[0][4].modifiers.repeating, false);
+            assert.strictEqual(line[0][4].modifiers.optional, false);
 
-            assert.strictEqual(line[5].type, args.OPT_TYPE.FLAG_LONG);
-            assert.strictEqual(line[5].name, "--speed");
-            assert.strictEqual(line[5].arg, "<kn>");
-            assert.strictEqual(line[5].modifiers.repeating, false);
-            assert.strictEqual(line[5].modifiers.optional, true);
+            assert.strictEqual(line[0][5].type, args.OPT_TYPE.FLAG_LONG);
+            assert.strictEqual(line[0][5].name, '--speed');
+            assert.strictEqual(line[0][5].arg, '<kn>');
+            assert.strictEqual(line[0][5].modifiers.repeating, false);
+            assert.strictEqual(line[0][5].modifiers.optional, true);
         });
     });
 
     describe('naval_fate mine (set|remove) <x> <y> [--moored|--drifting]', function() {
         it('should parse', function() {
 
-            try{
             var line = parse.run(
                 usage.line('naval_fate')
-              , 'naval_fate mine (set|remove) <x> <y>'// [--moored|--drifting]'
+              , 'naval_fate mine (set|remove) <x> <y> [--moored|--drifting]'
             );
-            } catch(e) {
-                console.log(e.toString());
-                // return console.log(e.stack);
-                return;
-            }
 
-            // assert.strictEqual(line[0].type, args.OPT_TYPE.COMMAND);
-            // assert.strictEqual(line[0].name, "mine");
-            // assert.strictEqual(line[0].modifiers.repeating, false);
-            //
-            // assert.strictEqual(line[1].type, args.OPT_TYPE.COMMAND);
-            // assert.strictEqual(line[1].name, "mine");
-            // assert.strictEqual(line[1].modifiers.repeating, false);
+            assert.strictEqual(line[0][0].type, args.OPT_TYPE.COMMAND);
+            assert.strictEqual(line[0][0].name, 'mine');
+            assert.strictEqual(line[0][0].modifiers.repeating, false);
 
+            assert.strictEqual(line[0][1].type, args.OPT_TYPE.GROUP);
+            assert.strictEqual(line[0][1].required, true);
 
-            console.log(line);
+            assert.strictEqual(line[0][1].nodes[0][0].type, args.OPT_TYPE.COMMAND);
+            assert.strictEqual(line[0][1].nodes[0][0].name, 'set');
+            assert.strictEqual(line[0][1].nodes[0][0].modifiers.repeating, false);
+
+            assert.strictEqual(line[0][1].nodes[1][0].type, args.OPT_TYPE.COMMAND);
+            assert.strictEqual(line[0][1].nodes[1][0].name, 'remove');
+            assert.strictEqual(line[0][1].nodes[1][0].modifiers.repeating, false);
+
+            assert.strictEqual(line[0][2].type, args.OPT_TYPE.POSITIONAL);
+            assert.strictEqual(line[0][2].name, '<x>');
+            assert.strictEqual(line[0][2].modifiers.repeating, false);
+            assert.strictEqual(line[0][2].modifiers.optional, false);
+
+            assert.strictEqual(line[0][3].type, args.OPT_TYPE.POSITIONAL);
+            assert.strictEqual(line[0][3].name, '<y>');
+            assert.strictEqual(line[0][3].modifiers.repeating, false);
+            assert.strictEqual(line[0][3].modifiers.optional, false);
+
+            assert.strictEqual(line[0][4].type, args.OPT_TYPE.GROUP);
+            assert.strictEqual(line[0][4].required, false);
+
+            assert.strictEqual(line[0][4].nodes[0][0].type, args.OPT_TYPE.FLAG_LONG);
+            assert.strictEqual(line[0][4].nodes[0][0].name, '--moored');
+            assert.strictEqual(line[0][4].nodes[0][0].modifiers.repeating, false);
+            assert.strictEqual(line[0][4].nodes[0][0].modifiers.optional, false);
+
+            assert.strictEqual(line[0][4].nodes[1][0].type, args.OPT_TYPE.FLAG_LONG);
+            assert.strictEqual(line[0][4].nodes[1][0].name, '--drifting');
+            assert.strictEqual(line[0][4].nodes[1][0].modifiers.repeating, false);
+            assert.strictEqual(line[0][4].nodes[1][0].modifiers.optional, false);
         });
     });
 });
