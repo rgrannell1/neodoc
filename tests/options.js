@@ -98,7 +98,7 @@ describe('single option block', function() {
             );
 
             assert.equal(option.flags.length, 1);
-            assert.equal(option.flags[0].name, 'a');
+            assert.equal(option.flags[0].name, '-a');
         });
     });
 
@@ -111,8 +111,8 @@ describe('single option block', function() {
             );
 
             assert.equal(option.flags.length, 2);
-            assert.equal(option.flags[0].name, 'a');
-            assert.equal(option.flags[1].name, 'all');
+            assert.equal(option.flags[0].name, '-a');
+            assert.equal(option.flags[1].name, '--all');
         });
     });
 
@@ -129,9 +129,9 @@ describe('single option block', function() {
             }
 
             assert.equal(option.flags.length, 2);
-            assert.equal(option.flags[0].name, 'f');
+            assert.equal(option.flags[0].name, '-f');
             assert.equal(option.flags[0].arg, '<file>');
-            assert.equal(option.flags[1].name, 'file');
+            assert.equal(option.flags[1].name, '--file');
             assert.equal(option.flags[1].arg, '<file>');
         });
     });
@@ -145,8 +145,8 @@ describe('single option block', function() {
             );
 
             assert.equal(option.flags.length, 2);
-            assert.equal(option.flags[0].name, 'a');
-            assert.equal(option.flags[1].name, 'all');
+            assert.equal(option.flags[0].name, '-a');
+            assert.equal(option.flags[1].name, '--all');
         });
     });
 
@@ -159,8 +159,8 @@ describe('single option block', function() {
             );
 
             assert.equal(option.flags.length, 2);
-            assert.equal(option.flags[0].name, 'a');
-            assert.equal(option.flags[1].name, 'all');
+            assert.equal(option.flags[0].name, '-a');
+            assert.equal(option.flags[1].name, '--all');
         });
     });
 
@@ -172,7 +172,7 @@ describe('single option block', function() {
             );
 
             assert.equal(option.flags.length, 1);
-            assert.equal(option.flags[0].name, 'all');
+            assert.equal(option.flags[0].name, '--all');
         });
     });
 
@@ -184,7 +184,7 @@ describe('single option block', function() {
             );
 
             assert.equal(option.flags.length, 1);
-            assert.equal(option.flags[0].name, 'all');
+            assert.equal(option.flags[0].name, '--all');
             assert.equal(option.flags[0].arg,  'ALL');
         });
     });
@@ -197,7 +197,7 @@ describe('single option block', function() {
             );
 
             assert.equal(option.flags.length, 1);
-            assert.equal(option.flags[0].name, 'all');
+            assert.equal(option.flags[0].name, '--all');
             assert.equal(option.flags[0].arg,  '<val>');
         });
     });
@@ -249,7 +249,7 @@ describe('single option block', function() {
 
     describe('[default] not at EOL', function() {
         it('should throw', function() {
-            // TODO: Restrict exception type.
+            // TODO: Restrict exception type
             assert.throws(
                 function() {
                     parse.run(

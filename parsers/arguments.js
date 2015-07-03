@@ -13,8 +13,73 @@ var _ = require('lodash')
  * @readonly
  */
 var OPT_TYPE = {
-    SHORT: 'FLAG'
-  , LONG:  'LONG'
+    COMMAND:    'COMMAND'
+  , POSITIONAL: 'POSITIONAL'
+  , FLAG_SHORT: 'FLAG_SHORT'
+  , FLAG_LONG:  'FLAG_LONG'
+};
+
+/**
+ * Argument modifiers.
+ * @enum
+ * @readonly
+ */
+var MOD_TYPE = {
+    OPTIONAL:  'OPTIONAL'
+  , REQUIRED:  'REQUIRED'
+  , REPEATING: 'REPEATING'
+}
+
+var maybeRepeated = function(parser) {
+    return parse.either(
+        parse.attempt(
+            lang.then(parser, text.string('...'))
+                .map(function(x) {
+                    return _.merge(x, {
+                        modifiers: { repeating: true }
+                    });
+                })
+        )
+      , parser
+            .map(function(x) {
+                return _.merge(x, {
+                    modifiers: { repeating: false }
+                });
+            })
+    );
+};
+
+/**
+ * Parse an argument potentially wrapped
+ * as optional `[ ... ]` or required `( ... )`.
+ *
+ * @param {Parser} The parser to wrap.
+ *
+ * @return {Parser}
+ */
+var maybeOptional = function(parser) {
+    return parse.either(
+        base.transform(
+            lang.between(
+                text.character('[')
+              , text.character(']')
+              , parser
+            )
+          , function(arg) {
+                return _.merge(arg, {
+                    modifiers: { optional: true }
+                });
+            }
+        )
+      , base.transform(
+            parser
+          , function(arg) {
+                return _.merge(arg, {
+                    modifiers: { optional: false }
+                });
+            }
+        )
+    );
 };
 
 /**
@@ -35,27 +100,50 @@ var argname = base.join(base.cons(
  * Parse an <argument>
  */
 var _argname_ = base.join(base.cons(
-    text.character('<')
-  , argname
-  , text.character('>')
-));
+    text.character('<'), argname, text.character('>')));
+
+/**
+ * Parse a command
+ */
+var command = maybeRepeated(
+    base.transform(
+        base.join(base.cons(
+            text.match(/[a-z]/)
+          , base.join(base.eager(text.match(/[a-z\-]/)))
+        ))
+      , function(name) {
+            return {
+                type: OPT_TYPE.COMMAND
+              , name: name
+            };
+        }
+    )
+);
 
 /**
  * Parse an argument, either:
  *
  * `ARGUMENT` or `<argument>`
  */
-var positionalArg = parse.either(ARGNAME, _argname_);
+var positionalArg = maybeRepeated(
+    parse.either(ARGNAME, _argname_)
+        .map(function(name) {
+            return {
+                type: OPT_TYPE.POSITIONAL
+              , name: name
+            }
+        })
+);
 
 /**
  * Parse a long option, either:
  *
  * `--option` or `--option=<arg>`
  */
-var longOption =
+var longOption = maybeRepeated(
     base.transform(
         base.cons(
-            parse.next(text.string('--'), argname)
+            base.join(base.cons(text.string('--'), argname))
           , parse.optional(parse.choice(
                 parse.attempt(parse.next(text.string('=')
                   , parse.either(
@@ -69,12 +157,12 @@ var longOption =
         )
       , _.spread(function(name, arg) {
             return {
-                type: OPT_TYPE.LONG
+                type: OPT_TYPE.FLAG_LONG
               , name: name
               , arg:  arg
             };
         })
-    );
+    ));
 
 /**
  * Parse a short unstacked option: `-f`
@@ -83,7 +171,7 @@ var shortOptionSingle =
     base.transform(
         base.cons(
             lang.then(
-                parse.next(text.character('-'), text.letter)
+                base.join(base.cons(text.character('-'), text.letter))
               , parse.not(text.letter)
             )
           , parse.optional(parse.attempt(
@@ -93,7 +181,7 @@ var shortOptionSingle =
         )
       , _.spread(function(name, arg) {
             return {
-                type: OPT_TYPE.SHORT
+                type: OPT_TYPE.FLAG_SHORT
               , name: name
               , arg:  arg
             };
@@ -106,9 +194,9 @@ var shortOptionSingle =
 var shortOptionStacked =
     base.transform(
         base.cons(
-            parse.next(
+            base.join(base.cons(
                 text.character('-')
-              , base.join(base.eager1(text.letter)))
+              , base.join(base.eager1(text.letter))))
           , parse.optional(parse.attempt(
                 parse.next(text.string(' '), parse.either(
                     parse.attempt(_argname_)
@@ -117,7 +205,7 @@ var shortOptionStacked =
         )
       , _.spread(function(name, arg) {
             return {
-                type: OPT_TYPE.SHORT
+                type: OPT_TYPE.FLAG_SHORT
               , name: name
               , arg:  arg
             };
@@ -140,46 +228,24 @@ var option = parse.choice(
   , parse.attempt(shortOptionStacked)
 );
 
-
-var maybeOptionalArg = function(parser) {
-    return parse.either(
-        base.transform(
-            lang.between(
-                text.character('[')
-              , text.character(']')
-              , parser
-            )
-          , function(name) { return {
-                arg:      name
-              , optional: true
-            }; }
-        )
-      , base.transform(
-            parser
-          , function(name) { return {
-                arg:      name
-              , optional: false
-            }; }
-        )
-    );
-};
-
 /**
  * Parse an argument, either positional
  * or not.
  */
 var argument = parse.choice(
-    maybeOptionalArg(parse.attempt(option))
-  , maybeOptionalArg(parse.attempt(positionalArg))
+    parse.attempt(command)
+  , maybeOptional(parse.attempt(option))
+  , maybeOptional(parse.attempt(positionalArg))
 );
 
 module.exports.OPT_TYPE = OPT_TYPE;
 module.exports.ARGNAME = ARGNAME;
 module.exports.argname = argname;
+module.exports.command = command;
 module.exports._argname_ = _argname_;
 module.exports.positionalArg = positionalArg;
 module.exports.option = option;
-module.exports.maybeOptionalArg = maybeOptionalArg;
+module.exports.maybeOptional = maybeOptional;
 module.exports.argument = argument;
 module.exports.longOption = longOption;
 module.exports.shortOptionStacked = shortOptionStacked;

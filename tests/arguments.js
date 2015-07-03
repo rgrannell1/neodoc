@@ -67,8 +67,8 @@ describe('baseline', function() {
                   , '--output=<arg>'
                 );
 
-                assert.equal(opt.type, args.OPT_TYPE.LONG);
-                assert.equal(opt.name, 'output');
+                assert.equal(opt.type, args.OPT_TYPE.FLAG_LONG);
+                assert.equal(opt.name, '--output');
                 assert.equal(opt.arg, '<arg>');
             });
         });
@@ -80,8 +80,8 @@ describe('baseline', function() {
                   , '--output <arg>'
                 );
 
-                assert.equal(opt.type, args.OPT_TYPE.LONG);
-                assert.equal(opt.name, 'output');
+                assert.equal(opt.type, args.OPT_TYPE.FLAG_LONG);
+                assert.equal(opt.name, '--output');
                 assert.equal(opt.arg, '<arg>');
             });
         });
@@ -93,8 +93,8 @@ describe('baseline', function() {
                   , '--some-feature'
                 );
 
-                assert.equal(opt.type, args.OPT_TYPE.LONG);
-                assert.equal(opt.name, 'some-feature');
+                assert.equal(opt.type, args.OPT_TYPE.FLAG_LONG);
+                assert.equal(opt.name, '--some-feature');
             });
         });
 
@@ -105,8 +105,8 @@ describe('baseline', function() {
                   , '-f'
                 );
 
-                assert.equal(opt.type, args.OPT_TYPE.SHORT);
-                assert.equal(opt.name, 'f');
+                assert.equal(opt.type, args.OPT_TYPE.FLAG_SHORT);
+                assert.equal(opt.name, '-f');
             });
         });
 
@@ -117,8 +117,8 @@ describe('baseline', function() {
                   , '-fFILE'
                 );
 
-                assert.equal(opt.type, args.OPT_TYPE.SHORT);
-                assert.equal(opt.name, 'fFILE');
+                assert.equal(opt.type, args.OPT_TYPE.FLAG_SHORT);
+                assert.equal(opt.name, '-fFILE');
             });
         });
     });
