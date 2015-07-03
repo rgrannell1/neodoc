@@ -17,6 +17,8 @@ var OPT_TYPE = {
   , POSITIONAL: 'POSITIONAL'
   , FLAG_SHORT: 'FLAG_SHORT'
   , FLAG_LONG:  'FLAG_LONG'
+  , GROUP:      'GROUP'
+  , MUTEX:      'MUTEX' // XXX: Remove
 };
 
 /**
@@ -30,6 +32,11 @@ var MOD_TYPE = {
   , REPEATING: 'REPEATING'
 }
 
+/**
+ * See if `parser` is succeeded by `...`
+ * which indicates that the element is
+ * ought to be repeated.
+ */
 var maybeRepeated = function(parser) {
     return parse.either(
         parse.attempt(
@@ -48,6 +55,10 @@ var maybeRepeated = function(parser) {
             })
     );
 };
+
+/**
+ * 
+ */
 
 /**
  * Parse an argument potentially wrapped
@@ -238,6 +249,45 @@ var argument = parse.choice(
   , maybeOptional(parse.attempt(positionalArg))
 );
 
+/**
+ * Parse a group of arguments.
+ * A group of arguments is seperated by a vertial bar `|`, i.e.:
+ *
+ * -h | --help
+ * 
+ */
+var group = parse.rec(function(self) {
+    return parse.eager(lang.sepBy(
+        base.$(text.character('|'))
+      , parse.eager(parse.many1(base.$(parse.choice(
+            parse.attempt(argument)
+          , parse.attempt(lang.between(
+                text.character('(')
+              , text.character(')')
+              , self
+            ).map(function(xs) {
+                return {
+                    type:     OPT_TYPE.GROUP
+                  , required: true
+                  , nodes:    xs
+                };
+            }))
+          , parse.attempt(lang.between(
+                text.character('[')
+              , text.character(']')
+              , self
+            ).map(function(xs) {
+                return {
+                    type:     OPT_TYPE.GROUP
+                  , required: false
+                  , nodes:    xs
+                };
+            }))
+        ))))
+    ))
+});
+
+
 module.exports.OPT_TYPE = OPT_TYPE;
 module.exports.ARGNAME = ARGNAME;
 module.exports.argname = argname;
@@ -250,3 +300,4 @@ module.exports.argument = argument;
 module.exports.longOption = longOption;
 module.exports.shortOptionStacked = shortOptionStacked;
 module.exports.shortOptionSingle = shortOptionSingle;
+module.exports.group = group;

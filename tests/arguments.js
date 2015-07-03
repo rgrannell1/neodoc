@@ -59,6 +59,22 @@ describe('baseline', function() {
         });
     });
 
+    describe('groups', function() {
+        it('should parse', function() {
+            try{
+            var group = parse.run(
+                args.group
+              , 'a | (b [(--c=<te>)] | d)'
+            );
+            }catch(e){
+                console.log(e.toString());
+                return;
+            }
+
+            console.log(JSON.stringify(group, null, 2));
+        });
+    });
+
     context('options', function() {
         describe('--output=<arg>', function() {
             it('should be parsed as option `output` with value `arg`', function() {

@@ -97,6 +97,15 @@ describe('defaults', function() {
                 return;
             }
 
+            // assert.strictEqual(line[0].type, args.OPT_TYPE.COMMAND);
+            // assert.strictEqual(line[0].name, "mine");
+            // assert.strictEqual(line[0].modifiers.repeating, false);
+            //
+            // assert.strictEqual(line[1].type, args.OPT_TYPE.COMMAND);
+            // assert.strictEqual(line[1].name, "mine");
+            // assert.strictEqual(line[1].modifiers.repeating, false);
+
+
             console.log(line);
         });
     });
