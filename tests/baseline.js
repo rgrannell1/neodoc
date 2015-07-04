@@ -14,7 +14,7 @@ describe('string', function() {
         var _run = function(f) {
             _.each([ 'ABC', 'abc', 'AbC', 'aBc' ], function(s) {
                 assert.equal(s, parse.run(f(s), s));
-            })
+            });
         };
 
         it('should parse strings', function() {
@@ -22,7 +22,7 @@ describe('string', function() {
         });
 
         it('should parse strings', function() {
-            _run(_.partial(base.string, _, false))
+            _run(_.partial(base.string, _, false));
         });
 
         it('should parse strings', function() {
@@ -42,10 +42,10 @@ describe('string', function() {
         it('should throw if case does not match', function() {
             assert.throws(
                 function() {
-                    parse.run(base.string('AbC', true), 'abc')
+                    parse.run(base.string('AbC', true), 'abc');
                 }
               , function(e) {
-                    return (e instanceof parse.ParseError)
+                    return (e instanceof parse.ParseError);
                 }
             );
         });
@@ -56,10 +56,10 @@ describe('string', function() {
                     parse.run(
                         base.string('AbC', base.string.Casing.SENSITIVE)
                       , 'abc'
-                    )
+                    );
                 }
               , function(e) {
-                    return (e instanceof parse.ParseError)
+                    return (e instanceof parse.ParseError);
                 }
             );
         });
@@ -111,7 +111,7 @@ describe('eager1', function() {
     it('should not allow empty input', function() {
         assert.throws(
             function() {
-                parse.run(base.eager1(text.letter), '').join('')
+                parse.run(base.eager1(text.letter), '').join('');
             }
           , function(e) {
                 return (e instanceof parse.ParseError);
@@ -145,7 +145,7 @@ describe('repeatedly', function() {
               , 'abc'
             )
         );
-    })
+    });
 });
 
 describe('$', function() {
