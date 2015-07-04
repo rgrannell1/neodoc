@@ -75,7 +75,8 @@ describe('defaults', function() {
             assert.strictEqual(line[0][4].modifiers.repeating, false);
             assert.strictEqual(line[0][4].modifiers.optional, false);
 
-            assert.strictEqual(line[0][5].type, nodes.TYPE.FLAG_LONG);
+            assert.strictEqual(line[0][5].type, nodes.TYPE.OPTION);
+            assert.strictEqual(line[0][5].long, true);
             assert.strictEqual(line[0][5].name, '--speed');
             assert.strictEqual(line[0][5].arg, '<kn>');
             assert.strictEqual(line[0][5].modifiers.repeating, false);
@@ -119,12 +120,14 @@ describe('defaults', function() {
             assert.strictEqual(line[0][4].type, nodes.TYPE.GROUP);
             assert.strictEqual(line[0][4].required, false);
 
-            assert.strictEqual(line[0][4].nodes[0][0].type, nodes.TYPE.FLAG_LONG);
+            assert.strictEqual(line[0][4].nodes[0][0].type, nodes.TYPE.OPTION);
+            assert.strictEqual(line[0][4].nodes[0][0].long, true);
             assert.strictEqual(line[0][4].nodes[0][0].name, '--moored');
             assert.strictEqual(line[0][4].nodes[0][0].modifiers.repeating, false);
             assert.strictEqual(line[0][4].nodes[0][0].modifiers.optional, false);
 
-            assert.strictEqual(line[0][4].nodes[1][0].type, nodes.TYPE.FLAG_LONG);
+            assert.strictEqual(line[0][4].nodes[1][0].type, nodes.TYPE.OPTION);
+            assert.strictEqual(line[0][4].nodes[1][0].long, true);
             assert.strictEqual(line[0][4].nodes[1][0].name, '--drifting');
             assert.strictEqual(line[0][4].nodes[1][0].modifiers.repeating, false);
             assert.strictEqual(line[0][4].nodes[1][0].modifiers.optional, false);
@@ -169,12 +172,14 @@ describe('defaults', function() {
             assert.strictEqual(line[0][4].required, false);
             assert.strictEqual(line[0][4].modifiers.repeating, true);
 
-            assert.strictEqual(line[0][4].nodes[0][0].type, nodes.TYPE.FLAG_LONG);
+            assert.strictEqual(line[0][4].nodes[0][0].type, nodes.TYPE.OPTION);
+            assert.strictEqual(line[0][4].nodes[0][0].long, true);
             assert.strictEqual(line[0][4].nodes[0][0].name, '--moored');
             assert.strictEqual(line[0][4].nodes[0][0].modifiers.repeating, false);
             assert.strictEqual(line[0][4].nodes[0][0].modifiers.optional, false);
 
-            assert.strictEqual(line[0][4].nodes[1][0].type, nodes.TYPE.FLAG_LONG);
+            assert.strictEqual(line[0][4].nodes[1][0].type, nodes.TYPE.OPTION);
+            assert.strictEqual(line[0][4].nodes[1][0].long, true);
             assert.strictEqual(line[0][4].nodes[1][0].name, '--drifting');
             assert.strictEqual(line[0][4].nodes[1][0].modifiers.repeating, false);
             assert.strictEqual(line[0][4].nodes[1][0].modifiers.optional, false);
