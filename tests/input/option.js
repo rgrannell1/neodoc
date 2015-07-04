@@ -12,13 +12,12 @@ describe('input', function() {
     describe('-f "./root"', function() {
         it('should parse', function() {
             var opt = parse.run(
-                option(true)
+                option('f', true)
               , '-f "./root"'
             );
 
             assert.strictEqual(opt.type, nodes.TYPE.OPTION);
             assert.strictEqual(opt.long, false);
-            assert.strictEqual(opt.stacked, false);
             assert.strictEqual(opt.name, '-f');
             assert.strictEqual(opt.arg, './root');
         });
@@ -27,13 +26,12 @@ describe('input', function() {
     describe('-f \'./root\'', function() {
         it('should parse', function() {
             var opt = parse.run(
-                option(true)
+                option('f', true)
               , '-f \'./root\''
             );
 
             assert.strictEqual(opt.type, nodes.TYPE.OPTION);
             assert.strictEqual(opt.long, false);
-            assert.strictEqual(opt.stacked, false);
             assert.strictEqual(opt.name, '-f');
             assert.strictEqual(opt.arg, './root');
         });
@@ -42,59 +40,13 @@ describe('input', function() {
     describe('-f ./root', function() {
         it('should parse', function() {
             var opt = parse.run(
-                option(true)
+                option('f', true)
               , '-f ./root'
             );
 
             assert.strictEqual(opt.type, nodes.TYPE.OPTION);
             assert.strictEqual(opt.long, false);
-            assert.strictEqual(opt.stacked, false);
             assert.strictEqual(opt.name, '-f');
-            assert.strictEqual(opt.arg, './root');
-        });
-    });
-
-    describe('-abcf ./root', function() {
-        it('should parse', function() {
-            var opt = parse.run(
-                option(true)
-              , '-abcf ./root'
-            );
-
-            assert.strictEqual(opt.type, nodes.TYPE.OPTION);
-            assert.strictEqual(opt.long, false);
-            assert.strictEqual(opt.stacked, true);
-            assert.strictEqual(opt.name, '-abcf');
-            assert.strictEqual(opt.arg, './root');
-        });
-    });
-
-    describe('-abcf "./root"', function() {
-        it('should parse', function() {
-            var opt = parse.run(
-                option(true)
-              , '-abcf "./root"'
-            );
-
-            assert.strictEqual(opt.type, nodes.TYPE.OPTION);
-            assert.strictEqual(opt.long, false);
-            assert.strictEqual(opt.stacked, true);
-            assert.strictEqual(opt.name, '-abcf');
-            assert.strictEqual(opt.arg, './root');
-        });
-    });
-
-    describe('-abcf \'./root\'', function() {
-        it('should parse', function() {
-            var opt = parse.run(
-                option(true)
-              , '-abcf \'./root\''
-            );
-
-            assert.strictEqual(opt.type, nodes.TYPE.OPTION);
-            assert.strictEqual(opt.long, false);
-            assert.strictEqual(opt.stacked, true);
-            assert.strictEqual(opt.name, '-abcf');
             assert.strictEqual(opt.arg, './root');
         });
     });
@@ -102,7 +54,7 @@ describe('input', function() {
     describe('--output-file "./root"', function() {
         it('should parse', function() {
             var opt = parse.run(
-                option(true)
+                option('output-file', true)
               , '--output-file "./root"'
             );
 
@@ -116,7 +68,7 @@ describe('input', function() {
     describe('--output-file \'./root\'', function() {
         it('should parse', function() {
             var opt = parse.run(
-                option(true)
+                option('output-file', true)
               , '--output-file \'./root\''
             );
 
@@ -130,7 +82,7 @@ describe('input', function() {
     describe('--output-file ./root', function() {
         it('should parse', function() {
             var opt = parse.run(
-                option(true)
+                option('output-file', true)
               , '--output-file ./root'
             );
 
@@ -144,7 +96,7 @@ describe('input', function() {
     describe('--output-file="./root"', function() {
         it('should parse', function() {
             var opt = parse.run(
-                option(true)
+                option('output-file', true)
               , '--output-file="./root"'
             );
 
@@ -158,7 +110,7 @@ describe('input', function() {
     describe('--output-file=\'./root\'', function() {
         it('should parse', function() {
             var opt = parse.run(
-                option(true)
+                option('output-file', true)
               , '--output-file=\'./root\''
             );
 
@@ -172,7 +124,7 @@ describe('input', function() {
     describe('--output-file=./root', function() {
         it('should parse', function() {
             var opt = parse.run(
-                option(true)
+                option('output-file', true)
               , '--output-file=./root'
             );
 
