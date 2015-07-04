@@ -47,24 +47,6 @@ var string = function(str, casing) {
 var space = text.match(/[ ]/, 'space');
 
 /**
- * Run function `f` on the result
- * of the parser `p`.
- *
- * @param {Parser}
- * The parser to run the function on.
- *
- * @param {Function} f
- * The function to apply to the results.
- *
- * @return {Parser}
- */
-var transform = function(p, f) {
-    return p.chain(function(xs) {
-        return parse.of(f(xs));
-    });
-};
-
-/**
  * Concatenate the results of a parse.
  *
  * @param {String} [sep]
@@ -82,7 +64,7 @@ var join = function(sep, parser) {
         sep = '';
     }
 
-    return transform(parser, function(xs) {
+    return parser.map(function(xs) {
         return _.isArray(xs)
           ? xs.join(sep)
           : xs;
@@ -217,7 +199,6 @@ module.exports.$ = $;
 module.exports.string = string;
 module.exports.string.Casing = Casing;
 module.exports.space = space;
-module.exports.transform = transform;
 module.exports.join = join;
 module.exports.eager = eager;
 module.exports.eager1 = eager1;

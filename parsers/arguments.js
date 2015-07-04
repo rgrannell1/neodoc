@@ -54,26 +54,20 @@ var maybeRepeated = function(parser) {
  */
 var maybeOptional = function(parser) {
     return parse.either(
-        base.transform(
-            lang.between(
-                text.character('[')
-              , text.character(']')
-              , parser
-            )
-          , function(arg) {
-                return _.merge(arg, {
-                    modifiers: { optional: true }
-                });
-            }
-        )
-      , base.transform(
-            parser
-          , function(arg) {
-                return _.merge(arg, {
-                    modifiers: { optional: false }
-                });
-            }
-        )
+        lang.between(
+            text.character('[')
+          , text.character(']')
+          , parser
+        ).map(function(arg) {
+            return _.merge(arg, {
+                modifiers: { optional: true }
+            });
+        })
+      , parser.map(function(arg) {
+            return _.merge(arg, {
+                modifiers: { optional: false }
+            });
+        })
     );
 };
 
@@ -101,18 +95,15 @@ var _argname_ = base.join(base.cons(
  * Parse a command
  */
 var command = maybeRepeated(
-    base.transform(
-        base.join(base.cons(
-            text.match(/[a-z]/)
-          , base.join(base.eager(text.match(/[a-z\-]/)))
-        ))
-      , function(name) {
-            return {
-                type: OPT_TYPE.COMMAND
-              , name: name
-            };
-        }
-    )
+    base.join(base.cons(
+        text.match(/[a-z]/)
+      , base.join(base.eager(text.match(/[a-z\-]/)))
+    )).map(function(name) {
+        return {
+            type: OPT_TYPE.COMMAND
+          , name: name
+        };
+    })
 );
 
 /**
@@ -136,76 +127,71 @@ var positionalArg = maybeRepeated(
  * `--option` or `--option=<arg>`
  */
 var longOption = maybeRepeated(
-    base.transform(
-        base.cons(
-            base.join(base.cons(text.string('--'), argname))
-          , parse.optional(parse.choice(
-                parse.attempt(parse.next(text.string('=')
-                  , parse.either(
-                        parse.attempt(_argname_)
-                      , parse.attempt(ARGNAME))))
-              , parse.attempt(parse.next(text.string(' ')
-                  , parse.either(
-                        parse.attempt(_argname_)
-                      , parse.attempt(ARGNAME))))
-            ))
-        )
-      , _.spread(function(name, arg) {
+    base.cons(
+        base.join(base.cons(text.string('--'), argname))
+      , parse.optional(parse.choice(
+            parse.attempt(parse.next(text.string('=')
+              , parse.either(
+                    parse.attempt(_argname_)
+                  , parse.attempt(ARGNAME))))
+          , parse.attempt(parse.next(text.string(' ')
+              , parse.either(
+                    parse.attempt(_argname_)
+                  , parse.attempt(ARGNAME))))
+        ))
+    ).map(_.spread(function(name, arg) {
             return {
                 type: OPT_TYPE.FLAG_LONG
               , name: name
               , arg:  arg
             };
-        })
-    ));
+        }
+    ))
+);
 
 /**
  * Parse a short unstacked option: `-f`
  */
 var shortOptionSingle =
-    base.transform(
-        base.cons(
-            lang.then(
-                base.join(base.cons(text.character('-'), text.letter))
-              , parse.not(text.letter)
-            )
-          , parse.optional(parse.attempt(
-                parse.next(text.string(' '), parse.either(
-                    parse.attempt(_argname_)
-                  , parse.attempt(ARGNAME)))))
+    base.cons(
+        lang.then(
+            base.join(base.cons(text.character('-'), text.letter))
+          , parse.not(text.letter)
         )
-      , _.spread(function(name, arg) {
-            return {
-                type: OPT_TYPE.FLAG_SHORT
-              , name: name
-              , arg:  arg
-            };
-        })
-    );
+      , parse.optional(parse.attempt(
+            parse.next(text.string(' '), parse.either(
+                parse.attempt(_argname_)
+              , parse.attempt(ARGNAME)))))
+    ).map(_.spread(function(name, arg) {
+        return {
+            type: OPT_TYPE.FLAG_SHORT
+          , name: name
+          , arg:  arg
+        };
+    }))
+;
 
 /**
  * Parse a short unstacked option, e.g.: `-fabc`
  */
 var shortOptionStacked =
-    base.transform(
-        base.cons(
-            base.join(base.cons(
-                text.character('-')
-              , base.join(base.eager1(text.letter))))
-          , parse.optional(parse.attempt(
-                parse.next(text.string(' '), parse.either(
-                    parse.attempt(_argname_)
-                  , parse.attempt(ARGNAME)
-                ))))
-        )
-      , _.spread(function(name, arg) {
-            return {
-                type: OPT_TYPE.FLAG_SHORT
-              , name: name
-              , arg:  arg
-            };
-        })
-    );
+    base.cons(
+        base.join(base.cons(
+            text.character('-')
+          , base.join(base.eager1(text.letter))))
+      , parse.optional(parse.attempt(
+            parse.next(text.string(' '), parse.either(
+                parse.attempt(_argname_)
+              , parse.attempt(ARGNAME)
+            ))))
+    ).map(_.spread(function(name, arg) {
+        return {
+            type: OPT_TYPE.FLAG_SHORT
+          , name: name
+          , arg:  arg
+        };
+    }))
+;
 
 /**
  * Parse a single option, i.e.:

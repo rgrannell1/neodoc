@@ -66,20 +66,6 @@ describe('string', function() {
     });
 });
 
-describe('transform', function() {
-    it('should transform parse results', function() {
-        assert.equal(
-            8
-          , parse.run(
-                base.transform(
-                    text.digit
-                  , function(n) { return parseInt(n) * 2; })
-              , '4'
-            )
-        );
-    });
-});
-
 describe('join', function() {
     it('should join parse results with the seperator', function() {
         assert.equal(
