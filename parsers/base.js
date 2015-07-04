@@ -25,6 +25,8 @@ var Casing = {
  *
  * @param {Casing|Boolean} casing
  * The casing to use when matching.
+ *
+ * @returns {Parser}
  */
 var string = function(str, casing) {
     casing = (typeof casing === 'string')
@@ -32,7 +34,7 @@ var string = function(str, casing) {
            : (typeof casing === 'boolean')
                 ? (casing ? Casing.SENSITIVE : Casing.INSENSITIVE)
            : Casing.INSENSITIVE;
-    return parse.attempt(_.foldr(str, function(p, c, i, s) {
+    return parse.attempt(_.foldr(str, function(p, c) {
         return parse.next(parse.token(function(t) {
             return ((t === c)
               || (casing === Casing.INSENSITIVE
@@ -119,22 +121,6 @@ var cons = function() {
 };
 
 /**
- * Collect all parsers and run `f`
- * on them
- */
-var all = function() {
-    return _.foldl(_.toArray(arguments), function(acc, parser) {
-        return acc.chain(function(accout) {
-            return parser.chain(function(parserout) {
-                accout = _.isArray(accout) ? accout : [ accout ];
-                return parse.of(accout.concat([ parserout ]));
-            });
-        });
-    });
-};
-
-
-/**
  * Runs a parser recursively, collecting
  * results of `parser` in a list.
  *
@@ -157,10 +143,14 @@ var repeatedly = function(parser) {
 
 /**
  * Ignore white space before and after
+ *
+ * @param {Parser} parser
+ *
+ * @returns {Parser}
  */
-var $ = function(p) {
+var $ = function(parser) {
     return lang.then(
-        parse.next(parse.many(space), p)
+        parse.next(parse.many(space), parser)
       , parse.many(space)
     );
 };
@@ -196,15 +186,15 @@ var fail = function(msg) {
 };
 
 module.exports.$ = $;
-module.exports.string = string;
-module.exports.string.Casing = Casing;
-module.exports.space = space;
 module.exports.join = join;
-module.exports.eager = eager;
-module.exports.eager1 = eager1;
 module.exports.cons = cons;
-module.exports.repeatedly = repeatedly;
+module.exports.fail = fail;
+module.exports.space = space;
+module.exports.eager = eager;
+module.exports.string = string;
+module.exports.eager1 = eager1;
 module.exports.quoted = quoted;
+module.exports.string.Casing = Casing;
+module.exports.repeatedly = repeatedly;
 module.exports.singleQuoted = quoted('\'');
 module.exports.doubleQuoted = quoted('"');
-module.exports.fail = fail;

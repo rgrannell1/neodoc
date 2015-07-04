@@ -320,13 +320,12 @@ var metaGroup = parse.rec(function(self) {
     ))
 });
 
-module.exports.OPT_TYPE = OPT_TYPE;
-module.exports.ARGNAME = ARGNAME;
-module.exports._argname_ = _argname_;
-module.exports.command = command;
-
 module.exports.option = option;
+module.exports.command = command;
+module.exports.ARGNAME = ARGNAME;
 module.exports.argument = argument;
+module.exports.OPT_TYPE = OPT_TYPE;
+module.exports._argname_ = _argname_;
 
 module.exports.meta = {};
 module.exports.meta.group = metaGroup;
