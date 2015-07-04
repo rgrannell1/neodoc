@@ -2,10 +2,9 @@
 
 var _ = require('lodash')
   , parse = require('bennu').parse
-  , text = require('bennu').text
   , assert = require('assert')
-  , usage = require('../parsers/usage')
-  , docopt = require('../parsers/docopt')
+  , meta = require('../lib/parse/meta')
+  , docopt = require('../lib/docopt')
 ;
 
 describe('docopt', function() {
@@ -13,7 +12,7 @@ describe('docopt', function() {
         it('should generate a valid parser', function() {
             var p = docopt.generate(
                 [parse.run(
-                    usage.line('naval_fate')
+                    meta.usage.line('naval_fate')
                   , 'naval_fate ship <name> move <x> <y> --speed=<kn> --foo --bar'
                 )]
             );

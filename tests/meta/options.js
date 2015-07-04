@@ -4,8 +4,8 @@ var _ = require('lodash')
   , parse = require('bennu').parse
   , text = require('bennu').text
   , assert = require('assert')
-  , options = require('../parsers/options')
-  , docopt = require('../docopt')
+  , meta = require('../../lib/parse/meta')
+  , util = require('../../lib/util')
 ;
 
 /**
@@ -27,7 +27,7 @@ describe('defaults', function() {
     describe('[default: "/Users/my account/"]', function() {
         it('should parse "/Users/my account/"', function() {
             var def = parse.run(
-                options.defaults
+                meta.options.defaults
               , '[default: "/Users/my account/"]'
             );
             assert.strictEqual(_.isArray(def), true);
@@ -38,7 +38,7 @@ describe('defaults', function() {
     describe('[default: \'/Users/my account/\']', function() {
         it('should parse \'/Users/my account/\'', function() {
             var def = parse.run(
-                options.defaults
+                meta.options.defaults
               , '[default: \'/Users/my account/\']'
             );
             assert.strictEqual(_.isArray(def), true);
@@ -49,7 +49,7 @@ describe('defaults', function() {
     describe('[default: /root]', function() {
         it('should parse /root', function() {
             var def = parse.run(
-                options.defaults
+                meta.options.defaults
               , '[default: /root]'
             );
             assert.strictEqual(_.isArray(def), true);
@@ -60,7 +60,7 @@ describe('defaults', function() {
     describe('[default: /root /dev]', function() {
         it('should parse /root /dev', function() {
             var def = parse.run(
-                options.defaults
+                meta.options.defaults
               , '[default: /root /dev]'
             );
             assert.strictEqual(_.isArray(def), true);
@@ -75,7 +75,7 @@ describe('single option block', function() {
     describe('-a All.', function() {
         it('should not parse - 2 spaces required', function() {
             assert.throws(
-                function()  { parse.run(options.option, '-a All.'); }
+                function()  { parse.run(meta.options.line, '-a All.'); }
               , function(e) { return e instanceof parse.ParseError; }
             );
         });
@@ -84,7 +84,7 @@ describe('single option block', function() {
     describe('-a', function() {
         it('should not parse - description required', function() {
             assert.throws(
-                function()  { parse.run(options.option, '-a'); }
+                function()  { parse.run(meta.options.line, '-a'); }
               , function(e) { return e instanceof parse.ParseError; }
             );
         });
@@ -93,7 +93,7 @@ describe('single option block', function() {
     describe('-a  All.', function() {
         it('should parse', function() {
             var option = parse.run(
-                options.option
+                meta.options.line
               , '-a  All.'
             );
 
@@ -106,7 +106,7 @@ describe('single option block', function() {
         it('should parse', function() {
 
             var option = parse.run(
-                options.option
+                meta.options.line
               , '-a, --all  All.'
             );
 
@@ -119,14 +119,10 @@ describe('single option block', function() {
     describe('-f <file>, --file  <file>  All.', function() {
         it('should parse', function() {
 
-            try{
             var option = parse.run(
-                options.option
+                meta.options.line
               , '-f <file>, --file <file>  All.'
             );
-            } catch(e) {
-                return console.log(e);
-            }
 
             assert.equal(option.flags.length, 2);
             assert.equal(option.flags[0].name, '-f');
@@ -140,7 +136,7 @@ describe('single option block', function() {
         it('should parse', function() {
 
             var option = parse.run(
-                options.option
+                meta.options.line
               , '-a, --all  All.'
             );
 
@@ -154,7 +150,7 @@ describe('single option block', function() {
         it('should parse', function() {
 
             var option = parse.run(
-                options.option
+                meta.options.line
               , '-a --all  All.'
             );
 
@@ -167,7 +163,7 @@ describe('single option block', function() {
     describe('--all  All.', function() {
         it('should parse', function() {
             var option = parse.run(
-                options.option
+                meta.options.line
               , '--all  All.'
             );
 
@@ -179,7 +175,7 @@ describe('single option block', function() {
     describe('--all ALL  All.', function() {
         it('should parse', function() {
             var option = parse.run(
-                options.option
+                meta.options.line
               , '--all ALL  All.'
             );
 
@@ -192,7 +188,7 @@ describe('single option block', function() {
     describe('--all=<val>  All.', function() {
         it('should parse', function() {
             var option = parse.run(
-                options.option
+                meta.options.line
               , '--all=<val>  All.'
             );
 
@@ -206,7 +202,7 @@ describe('single option block', function() {
         it('should parse', function() {
 
             var option = parse.run(
-                options.option
+                meta.options.line
               , '--all=<val>  All [default: true]'
             );
 
@@ -221,7 +217,7 @@ describe('single option block', function() {
         it('should parse if aligned', function() {
 
             var option = parse.run(
-                options.option
+                meta.options.line
               , '    --all=<val>  foo bar [default: 100]\n'
               + '                 qux '
             );
@@ -236,7 +232,7 @@ describe('single option block', function() {
         it('should parse if aligned', function() {
 
             var option = parse.run(
-                options.option
+                meta.options.line
               , '    --all=<val>  foo bar\n'
               + '                 qux    [default: 100]'
             );
@@ -253,7 +249,7 @@ describe('single option block', function() {
             assert.throws(
                 function() {
                     parse.run(
-                        options.option
+                        meta.options.line
                       , '    --all=<val>  foo [default: 100] bar\n'
                       + '                 qux '
                     );
@@ -268,7 +264,7 @@ describe('multiple options', function() {
         it('should parse', function() {
 
             var opts = parse.run(
-                options.options
+                meta.options
               , ' --foo=<val>      foo bar\n'
               + '                  qix zuc [default: 100 "salad"]\n'
               + ' --qux=<val>      micro phone\n'
@@ -290,7 +286,7 @@ describe('multiple options', function() {
             assert.throws(
                 function() {
                     parse.run(
-                        options.options
+                        meta.options
                     , ' --foo=<val>      foo bar\n'
                     + '                  qix zuc [default: 100 "salad"]\n'
                     + '   --qux=<val>      micro phone\n'
@@ -299,7 +295,7 @@ describe('multiple options', function() {
                     );
                 }
               , function(e) { return e instanceof parse.ParseError; }
-            )
+            );
         });
     });
 
@@ -308,57 +304,57 @@ describe('multiple options', function() {
             assert.throws(
                 function() {
                     parse.run(
-                        options.options
+                        meta.options
                     , ' --foo=<val>  foo bar\n'
                     + '                 qix zuc\n'
                     );
                 }
               , function(e) { return e instanceof parse.ParseError; }
-            )
+            );
         });
 
         it('should throw if under-dented', function() {
             assert.throws(
                 function() {
                     parse.run(
-                        options.options
+                        meta.options
                     , ' --foo=<val>  foo bar\n'
                     + '            qix zuc\n'
                     );
                 }
               , function(e) { return e instanceof parse.ParseError; }
-            )
+            );
         });
 
         it('should throw if different from first block (under)', function() {
             assert.throws(
                 function() {
                     parse.run(
-                        options.options
+                        meta.options
                     , ' --foo=<val>    foo bar\n'
                     + ' --bar=<xyz>  qix zuc\n'
                     );
                 }
-            )
+            );
         });
 
         it('should throw if different from first block (over)', function() {
             assert.throws(
                 function() {
                     parse.run(
-                        options.options
+                        meta.options
                     , ' --foo=<val>  foo bar\n'
                     + ' --bar=<xyz>    qix zuc\n'
                     );
                 }
-            )
+            );
         });
     });
 
     it('should parse the docopt example options', function() {
         parse.run(
-            options.options
-          , docopt.mstr('\
+            meta.options
+          , util.mstr('\
                  -h --help     Show this screen.                             \n\
                  --version     Show version.                                 \n\
                  --speed=<kn>  Speed in knots [default: 10]                  \n\
@@ -368,3 +364,4 @@ describe('multiple options', function() {
         );
     });
 });
+
