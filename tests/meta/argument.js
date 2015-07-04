@@ -77,7 +77,7 @@ describe('meta', function() {
                   , '--output=<arg>'
                 );
 
-                assert.strictEqual(opt.type, nodes.OPT_TYPE.FLAG_LONG);
+                assert.strictEqual(opt.type, nodes.TYPE.FLAG_LONG);
                 assert.strictEqual(opt.name, '--output');
                 assert.strictEqual(opt.arg, '<arg>');
             });
@@ -90,7 +90,7 @@ describe('meta', function() {
                   , '--output <arg>'
                 );
 
-                assert.strictEqual(opt.type, nodes.OPT_TYPE.FLAG_LONG);
+                assert.strictEqual(opt.type, nodes.TYPE.FLAG_LONG);
                 assert.strictEqual(opt.name, '--output');
                 assert.strictEqual(opt.arg, '<arg>');
             });
@@ -103,7 +103,7 @@ describe('meta', function() {
                   , '--some-feature'
                 );
 
-                assert.strictEqual(opt.type, nodes.OPT_TYPE.FLAG_LONG);
+                assert.strictEqual(opt.type, nodes.TYPE.FLAG_LONG);
                 assert.strictEqual(opt.name, '--some-feature');
             });
         });
@@ -115,7 +115,7 @@ describe('meta', function() {
                   , '-f'
                 );
 
-                assert.strictEqual(opt.type, nodes.OPT_TYPE.FLAG_SHORT);
+                assert.strictEqual(opt.type, nodes.TYPE.FLAG_SHORT);
                 assert.strictEqual(opt.name, '-f');
             });
         });
@@ -127,7 +127,7 @@ describe('meta', function() {
                   , '-fFILE'
                 );
 
-                assert.strictEqual(opt.type, nodes.OPT_TYPE.FLAG_SHORT);
+                assert.strictEqual(opt.type, nodes.TYPE.FLAG_SHORT);
                 assert.strictEqual(opt.name, '-fFILE');
             });
         });

@@ -20,12 +20,14 @@ describe('docopt', function() {
             try{
             var x = parse.run(
                 p
-              , 'ship "foo" move 10 10 --bar --speed=100 --foo="cool" --speed=200 '
+              , 'ship "foo" move 10 10 --foo --speed=10'// --bar --speed=100 --foo="cool" --speed=200 '
             );
             } catch(e) {
                 console.log(e.toString());
                 throw e;
             }
+
+            // assert.equal(x.)
 
             console.log(x);
         });

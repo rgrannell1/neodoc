@@ -16,7 +16,7 @@ describe('input', function() {
               , '-f "./root"'
             );
 
-            assert.strictEqual(opt.type, nodes.OPT_TYPE.FLAG_SHORT);
+            assert.strictEqual(opt.type, nodes.TYPE.FLAG_SHORT);
             assert.strictEqual(opt.name, '-f');
             assert.strictEqual(opt.arg, './root');
         });
@@ -29,7 +29,7 @@ describe('input', function() {
               , '-f \'./root\''
             );
 
-            assert.strictEqual(opt.type, nodes.OPT_TYPE.FLAG_SHORT);
+            assert.strictEqual(opt.type, nodes.TYPE.FLAG_SHORT);
             assert.strictEqual(opt.name, '-f');
             assert.strictEqual(opt.arg, './root');
         });
@@ -42,7 +42,7 @@ describe('input', function() {
               , '-f ./root'
             );
 
-            assert.strictEqual(opt.type, nodes.OPT_TYPE.FLAG_SHORT);
+            assert.strictEqual(opt.type, nodes.TYPE.FLAG_SHORT);
             assert.strictEqual(opt.name, '-f');
             assert.strictEqual(opt.arg, './root');
         });
@@ -55,7 +55,7 @@ describe('input', function() {
               , '-abcf ./root'
             );
 
-            assert.strictEqual(opt.type, nodes.OPT_TYPE.FLAG_SHORT);
+            assert.strictEqual(opt.type, nodes.TYPE.FLAG_SHORT);
             assert.strictEqual(opt.name, '-abcf');
             assert.strictEqual(opt.arg, './root');
         });
@@ -68,7 +68,7 @@ describe('input', function() {
               , '-abcf "./root"'
             );
 
-            assert.strictEqual(opt.type, nodes.OPT_TYPE.FLAG_SHORT);
+            assert.strictEqual(opt.type, nodes.TYPE.FLAG_SHORT);
             assert.strictEqual(opt.name, '-abcf');
             assert.strictEqual(opt.arg, './root');
         });
@@ -81,7 +81,7 @@ describe('input', function() {
               , '-abcf \'./root\''
             );
 
-            assert.strictEqual(opt.type, nodes.OPT_TYPE.FLAG_SHORT);
+            assert.strictEqual(opt.type, nodes.TYPE.FLAG_SHORT);
             assert.strictEqual(opt.name, '-abcf');
             assert.strictEqual(opt.arg, './root');
         });
@@ -94,7 +94,7 @@ describe('input', function() {
               , '--output-file "./root"'
             );
 
-            assert.strictEqual(opt.type, nodes.OPT_TYPE.FLAG_LONG);
+            assert.strictEqual(opt.type, nodes.TYPE.FLAG_LONG);
             assert.strictEqual(opt.name, '--output-file');
             assert.strictEqual(opt.arg, './root');
         });
@@ -107,7 +107,7 @@ describe('input', function() {
               , '--output-file \'./root\''
             );
 
-            assert.strictEqual(opt.type, nodes.OPT_TYPE.FLAG_LONG);
+            assert.strictEqual(opt.type, nodes.TYPE.FLAG_LONG);
             assert.strictEqual(opt.name, '--output-file');
             assert.strictEqual(opt.arg, './root');
         });
@@ -120,7 +120,7 @@ describe('input', function() {
               , '--output-file ./root'
             );
 
-            assert.strictEqual(opt.type, nodes.OPT_TYPE.FLAG_LONG);
+            assert.strictEqual(opt.type, nodes.TYPE.FLAG_LONG);
             assert.strictEqual(opt.name, '--output-file');
             assert.strictEqual(opt.arg, './root');
         });
@@ -133,7 +133,7 @@ describe('input', function() {
               , '--output-file="./root"'
             );
 
-            assert.strictEqual(opt.type, nodes.OPT_TYPE.FLAG_LONG);
+            assert.strictEqual(opt.type, nodes.TYPE.FLAG_LONG);
             assert.strictEqual(opt.name, '--output-file');
             assert.strictEqual(opt.arg, './root');
         });
@@ -146,7 +146,7 @@ describe('input', function() {
               , '--output-file=\'./root\''
             );
 
-            assert.strictEqual(opt.type, nodes.OPT_TYPE.FLAG_LONG);
+            assert.strictEqual(opt.type, nodes.TYPE.FLAG_LONG);
             assert.strictEqual(opt.name, '--output-file');
             assert.strictEqual(opt.arg, './root');
         });
@@ -159,7 +159,7 @@ describe('input', function() {
               , '--output-file=./root'
             );
 
-            assert.strictEqual(opt.type, nodes.OPT_TYPE.FLAG_LONG);
+            assert.strictEqual(opt.type, nodes.TYPE.FLAG_LONG);
             assert.strictEqual(opt.name, '--output-file');
             assert.strictEqual(opt.arg, './root');
         });
