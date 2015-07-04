@@ -273,11 +273,11 @@ var metaArgument = parse.choice(
  *
  * -h | --help
  */
-var _mkGroup = function(parser) { return parse.rec(function(self) {
+var metaGroup = parse.rec(function(self) {
     return parse.eager(lang.sepBy(
         base.$(text.character('|'))
       , parse.eager(parse.many1(base.$(parse.choice(
-            parse.attempt(parser)
+            parse.attempt(metaArgument)
           , parse.attempt(lang.between(
                 text.character('(')
               , text.character(')')
@@ -302,9 +302,7 @@ var _mkGroup = function(parser) { return parse.rec(function(self) {
             }))
         ))))
     ))
-}); };
-
-var metaGroup = _mkGroup(metaArgument);
+});
 
 module.exports.OPT_TYPE = OPT_TYPE;
 module.exports.ARGNAME = ARGNAME;
