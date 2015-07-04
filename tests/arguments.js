@@ -79,7 +79,7 @@ describe('baseline', function() {
         describe('--output=<arg>', function() {
             it('should be parsed as option `output` with value `arg`', function() {
                 var opt = parse.run(
-                    args.option
+                    args.meta.option
                   , '--output=<arg>'
                 );
 
@@ -92,7 +92,7 @@ describe('baseline', function() {
         describe('--output <arg>', function() {
             it('should be parsed as option `output` with value `arg`', function() {
                 var opt = parse.run(
-                    args.option
+                    args.meta.option
                   , '--output <arg>'
                 );
 
@@ -105,7 +105,7 @@ describe('baseline', function() {
         describe('--some-feature', function() {
             it('should be parsed as flag `some-feature`', function() {
                 var opt = parse.run(
-                    args.option
+                    args.meta.option
                   , '--some-feature'
                 );
 
@@ -117,7 +117,7 @@ describe('baseline', function() {
         describe('-f', function() {
             it('should be parsed as stacked flag `-f`', function() {
                 var opt = parse.run(
-                    args.option
+                    args.meta.option
                   , '-f'
                 );
 
@@ -129,7 +129,7 @@ describe('baseline', function() {
         describe('-fFILE', function() {
             it('should be parsed as stacked flags `-f -F -I -L -E`', function() {
                 var opt = parse.run(
-                    args.option
+                    args.meta.option
                   , '-fFILE'
                 );
 

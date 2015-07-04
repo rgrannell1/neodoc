@@ -111,33 +111,32 @@ var command = maybeRepeated(
  *
  * `ARGUMENT` or `<argument>`
  */
-var positionalArg = maybeRepeated(
-    parse.either(ARGNAME, _argname_)
+var _mkPositionalArg = function(parser) {
+    return parser
         .map(function(name) {
             return {
                 type: OPT_TYPE.POSITIONAL
               , name: name
             }
         })
-);
+};
+
+var metaPositionalArg = maybeRepeated(_mkPositionalArg(
+    parse.either(
+        parse.attempt(_argname_)
+      , parse.attempt(ARGNAME))));
 
 /**
  * Parse a long option, either:
  *
  * `--option` or `--option=<arg>`
  */
-var longOption = maybeRepeated(
-    base.cons(
+var _mkLongOption = function(parser) {
+    return base.cons(
         base.join(base.cons(text.string('--'), argname))
       , parse.optional(parse.choice(
-            parse.attempt(parse.next(text.string('=')
-              , parse.either(
-                    parse.attempt(_argname_)
-                  , parse.attempt(ARGNAME))))
-          , parse.attempt(parse.next(text.string(' ')
-              , parse.either(
-                    parse.attempt(_argname_)
-                  , parse.attempt(ARGNAME))))
+            parse.attempt(parse.next(text.string('='), parser))
+          , parse.attempt(parse.next(text.string(' '), parser))
         ))
     ).map(_.spread(function(name, arg) {
             return {
@@ -147,21 +146,24 @@ var longOption = maybeRepeated(
             };
         }
     ))
-);
+};
+
+var metaLongOption = maybeRepeated(_mkLongOption(
+    parse.either(
+        parse.attempt(_argname_)
+      , parse.attempt(ARGNAME))));
 
 /**
  * Parse a short unstacked option: `-f`
  */
-var shortOptionSingle =
-    base.cons(
+var _mkShortOptionSingle = function(parser) {
+    return base.cons(
         lang.then(
             base.join(base.cons(text.character('-'), text.letter))
           , parse.not(text.letter)
         )
       , parse.optional(parse.attempt(
-            parse.next(text.string(' '), parse.either(
-                parse.attempt(_argname_)
-              , parse.attempt(ARGNAME)))))
+            parse.next(text.string(' '), parser)))
     ).map(_.spread(function(name, arg) {
         return {
             type: OPT_TYPE.FLAG_SHORT
@@ -169,21 +171,24 @@ var shortOptionSingle =
           , arg:  arg
         };
     }))
-;
+};
+
+var metaShortOptionSingle = _mkShortOptionSingle(
+    parse.either(
+        parse.attempt(_argname_)
+      , parse.attempt(ARGNAME)));
 
 /**
  * Parse a short unstacked option, e.g.: `-fabc`
  */
-var shortOptionStacked =
-    base.cons(
+var _mkShortOptionStacked = function(parser) {
+    return base.cons(
         base.join(base.cons(
             text.character('-')
           , base.join(base.eager1(text.letter))))
       , parse.optional(parse.attempt(
-            parse.next(text.string(' '), parse.either(
-                parse.attempt(_argname_)
-              , parse.attempt(ARGNAME)
-            ))))
+            parse.next(text.string(' '), parser)
+            ))
     ).map(_.spread(function(name, arg) {
         return {
             type: OPT_TYPE.FLAG_SHORT
@@ -191,7 +196,12 @@ var shortOptionStacked =
           , arg:  arg
         };
     }))
-;
+};
+
+var metaShortOptionStacked = _mkShortOptionStacked(
+    parse.either(
+        parse.attempt(_argname_)
+      , parse.attempt(ARGNAME)));
 
 /**
  * Parse a single option, i.e.:
@@ -203,34 +213,33 @@ var shortOptionStacked =
  *     --output FILE -> [ --output, FILE ]
  *     -abc FILE     -> [ -abc,     FILE ]
  */
-var option = parse.choice(
-    parse.attempt(longOption)
-  , parse.attempt(shortOptionSingle)
-  , parse.attempt(shortOptionStacked)
+var metaOption = parse.choice(
+    parse.attempt(metaLongOption)
+  , parse.attempt(metaShortOptionSingle)
+  , parse.attempt(metaShortOptionStacked)
 );
 
 /**
  * Parse an argument, either positional
  * or not.
  */
-var argument = parse.choice(
+var metaArgument = parse.choice(
     parse.attempt(command)
-  , maybeOptional(parse.attempt(option))
-  , maybeOptional(parse.attempt(positionalArg))
+  , maybeOptional(parse.attempt(metaOption))
+  , maybeOptional(parse.attempt(metaPositionalArg))
 );
 
 /**
- * Parse a group of arguments.
- * A group of arguments is seperated by a vertial bar `|`, i.e.:
+ * Parse a group of `parser`s.
+ * A group of `parser`s is seperated by a vertial bar `|`, i.e.:
  *
  * -h | --help
- * 
  */
-var group = parse.rec(function(self) {
+var _mkGroup = function(parser) { return parse.rec(function(self) {
     return parse.eager(lang.sepBy(
         base.$(text.character('|'))
       , parse.eager(parse.many1(base.$(parse.choice(
-            parse.attempt(argument)
+            parse.attempt(parser)
           , parse.attempt(lang.between(
                 text.character('(')
               , text.character(')')
@@ -255,19 +264,21 @@ var group = parse.rec(function(self) {
             }))
         ))))
     ))
-});
+}); };
 
+var metaGroup = _mkGroup(metaArgument);
 
 module.exports.OPT_TYPE = OPT_TYPE;
+
 module.exports.ARGNAME = ARGNAME;
-module.exports.argname = argname;
-module.exports.command = command;
 module.exports._argname_ = _argname_;
-module.exports.positionalArg = positionalArg;
-module.exports.option = option;
-module.exports.maybeOptional = maybeOptional;
-module.exports.argument = argument;
-module.exports.longOption = longOption;
-module.exports.shortOptionStacked = shortOptionStacked;
-module.exports.shortOptionSingle = shortOptionSingle;
-module.exports.group = group;
+module.exports.command = command;
+
+module.exports.meta = {};
+module.exports.meta.group = metaGroup;
+module.exports.meta.option = metaOption;
+module.exports.meta.argument = metaArgument;
+module.exports.meta.longOption = metaLongOption;
+module.exports.meta.positionalArg = metaPositionalArg;
+module.exports.meta.shortOptionSingle = metaShortOptionSingle;
+module.exports.meta.shortOptionStacked = metaShortOptionStacked;

@@ -40,15 +40,15 @@ var defaults = lang.between(
 var leadingFlags = parse.getParserState.chain(function(state) {
     return parse.choice(
         parse.attempt(base.cons(
-            args.shortOptionSingle
+            args.meta.shortOptionSingle
           , parse.next(
               parse.either(
                   text.string(', ')
                 , text.string(' '))
-            , args.longOption)
+            , args.meta.longOption)
        ))
-      , parse.attempt(args.shortOptionSingle)
-      , parse.attempt(args.longOption)
+      , parse.attempt(args.meta.shortOptionSingle)
+      , parse.attempt(args.meta.longOption)
     )
     .map(function(x) { return _.isArray(x) ? x : [ x ]; })
     .chain(function(out) {

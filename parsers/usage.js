@@ -10,7 +10,7 @@ var _ = require('lodash')
 var line = function(program) {
     return parse.next(
         text.string(program)
-      , args.group
+      , args.meta.group
     );
 };
 
