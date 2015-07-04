@@ -38,7 +38,7 @@ describe('defaults', function() {
             assert.strictEqual(line[0][1].name, 'new');
 
             assert.strictEqual(line[0][2].type, args.OPT_TYPE.POSITIONAL);
-            assert.strictEqual(line[0][2].name, '<name>');
+            assert.strictEqual(line[0][2].arg, '<name>');
             assert.strictEqual(line[0][2].modifiers.optional, false);
             assert.strictEqual(line[0][2].modifiers.repeating, true);
         });
@@ -57,7 +57,7 @@ describe('defaults', function() {
             assert.strictEqual(line[0][0].modifiers.repeating, false);
 
             assert.strictEqual(line[0][1].type, args.OPT_TYPE.POSITIONAL);
-            assert.strictEqual(line[0][1].name, '<name>');
+            assert.strictEqual(line[0][1].arg, '<name>');
             assert.strictEqual(line[0][1].modifiers.repeating, false);
             assert.strictEqual(line[0][1].modifiers.optional, false);
 
@@ -66,12 +66,12 @@ describe('defaults', function() {
             assert.strictEqual(line[0][2].modifiers.repeating, false);
 
             assert.strictEqual(line[0][3].type, args.OPT_TYPE.POSITIONAL);
-            assert.strictEqual(line[0][3].name, '<x>');
+            assert.strictEqual(line[0][3].arg, '<x>');
             assert.strictEqual(line[0][3].modifiers.repeating, false);
             assert.strictEqual(line[0][3].modifiers.optional, false);
 
             assert.strictEqual(line[0][4].type, args.OPT_TYPE.POSITIONAL);
-            assert.strictEqual(line[0][4].name, '<y>');
+            assert.strictEqual(line[0][4].arg, '<y>');
             assert.strictEqual(line[0][4].modifiers.repeating, false);
             assert.strictEqual(line[0][4].modifiers.optional, false);
 
@@ -107,12 +107,12 @@ describe('defaults', function() {
             assert.strictEqual(line[0][1].nodes[1][0].modifiers.repeating, false);
 
             assert.strictEqual(line[0][2].type, args.OPT_TYPE.POSITIONAL);
-            assert.strictEqual(line[0][2].name, '<x>');
+            assert.strictEqual(line[0][2].arg, '<x>');
             assert.strictEqual(line[0][2].modifiers.repeating, false);
             assert.strictEqual(line[0][2].modifiers.optional, false);
 
             assert.strictEqual(line[0][3].type, args.OPT_TYPE.POSITIONAL);
-            assert.strictEqual(line[0][3].name, '<y>');
+            assert.strictEqual(line[0][3].arg, '<y>');
             assert.strictEqual(line[0][3].modifiers.repeating, false);
             assert.strictEqual(line[0][3].modifiers.optional, false);
 

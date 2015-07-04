@@ -113,10 +113,10 @@ var command = maybeRepeated(
  */
 var _mkPositionalArg = function(parser) {
     return parser
-        .map(function(name) {
+        .map(function(arg) {
             return {
                 type: OPT_TYPE.POSITIONAL
-              , name: name
+              , arg:  arg
             }
         })
 };
@@ -269,7 +269,6 @@ var _mkGroup = function(parser) { return parse.rec(function(self) {
 var metaGroup = _mkGroup(metaArgument);
 
 module.exports.OPT_TYPE = OPT_TYPE;
-
 module.exports.ARGNAME = ARGNAME;
 module.exports._argname_ = _argname_;
 module.exports.command = command;

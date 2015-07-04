@@ -7,7 +7,7 @@ var _ = require('lodash')
   , args = require('../parsers/arguments')
 ;
 
-describe('baseline', function() {
+describe('meta', function() {
 
     describe('ARGNAME', function() {
 
@@ -61,17 +61,10 @@ describe('baseline', function() {
 
     describe('groups', function() {
         it('should parse', function() {
-            try{
             var group = parse.run(
-                args.group
+                args.meta.group
               , 'a | (b [(--c=<te>)] | d)'
             );
-            }catch(e){
-                console.log(e.toString());
-                return;
-            }
-
-            console.log(JSON.stringify(group, null, 2));
         });
     });
 
@@ -138,4 +131,8 @@ describe('baseline', function() {
             });
         });
     });
+});
+
+describe('input', function() {
+
 });
