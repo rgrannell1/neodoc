@@ -18,19 +18,7 @@ var OPT_TYPE = {
   , FLAG_SHORT: 'FLAG_SHORT'
   , FLAG_LONG:  'FLAG_LONG'
   , GROUP:      'GROUP'
-  , MUTEX:      'MUTEX' // XXX: Remove
 };
-
-/**
- * Argument modifiers.
- * @enum
- * @readonly
- */
-var MOD_TYPE = {
-    OPTIONAL:  'OPTIONAL'
-  , REQUIRED:  'REQUIRED'
-  , REPEATING: 'REPEATING'
-}
 
 /**
  * See if `parser` is succeeded by `...`
@@ -55,10 +43,6 @@ var maybeRepeated = function(parser) {
             })
     );
 };
-
-/**
- * 
- */
 
 /**
  * Parse an argument potentially wrapped
