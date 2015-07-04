@@ -28,7 +28,7 @@ var OPT_TYPE = {
 var maybeRepeated = function(parser) {
     return parse.either(
         parse.attempt(
-            lang.then(parser, text.string('...'))
+            lang.then(parser, base.$(text.string('...')))
                 .map(function(x) {
                     return _.merge(x, {
                         modifiers: { repeating: true }
@@ -125,6 +125,12 @@ var metaPositionalArg = maybeRepeated(_mkPositionalArg(
     parse.either(
         parse.attempt(_argname_)
       , parse.attempt(ARGNAME))));
+
+var positionalArg = _mkPositionalArg(
+    parse.choice(
+        parse.attempt(base.singleQuoted)
+      , parse.attempt(base.doubleQuoted)
+      , base.join(base.eager1(text.noneOf(' ')))));
 
 /**
  * Parse a long option, either:
@@ -268,6 +274,16 @@ var metaArgument = parse.choice(
 );
 
 /**
+ * Parse an argument, either positional
+ * or not.
+ */
+var argument = parse.choice(
+    parse.attempt(command)
+  , maybeOptional(parse.attempt(option))
+  , maybeOptional(parse.attempt(positionalArg))
+);
+
+/**
  * Parse a group of `parser`s.
  * A group of `parser`s is seperated by a vertial bar `|`, i.e.:
  *
@@ -278,7 +294,7 @@ var metaGroup = parse.rec(function(self) {
         base.$(text.character('|'))
       , parse.eager(parse.many1(base.$(parse.choice(
             parse.attempt(metaArgument)
-          , parse.attempt(lang.between(
+          , maybeRepeated(parse.attempt(lang.between(
                 text.character('(')
               , text.character(')')
               , self
@@ -288,8 +304,8 @@ var metaGroup = parse.rec(function(self) {
                   , required: true
                   , nodes:    xs
                 };
-            }))
-          , parse.attempt(lang.between(
+            })))
+          , maybeRepeated(parse.attempt(lang.between(
                 text.character('[')
               , text.character(']')
               , self
@@ -299,7 +315,7 @@ var metaGroup = parse.rec(function(self) {
                   , required: false
                   , nodes:    xs
                 };
-            }))
+            })))
         ))))
     ))
 });
@@ -310,6 +326,7 @@ module.exports._argname_ = _argname_;
 module.exports.command = command;
 
 module.exports.option = option;
+module.exports.argument = argument;
 
 module.exports.meta = {};
 module.exports.meta.group = metaGroup;
