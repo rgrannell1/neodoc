@@ -1,79 +1,36 @@
-# Parsing game plan
+# Docopt.js
 
-1. The usage parser parses usage lines into an intermediate format:
+> Pure javascript implementation of docopt
 
-```javascript
-{ program: '<name>'
-, usage: [ <usage-line> ]
-}
-```
+:construction: ...work in progress... :construction:
 
-where `<usage-line>` is a list of arguments:
+Pure javascript implementation of the docopt language with a fresh and
+functional approach to things, using [bennu-js][bennu] for
+parsing and a fairly exhaustive test suite for asserting functionality and
+parsers.
 
-```
-// -fFILE -f FILE
-[
-    { type: 'MERGED_FLAGS'
-    , chars: 'fFILE'
-    }
-  , { type: 'FLAG_SHORT'
-    , char: 'f'
-    }
-  , { type: 'POSITIONAL'
-    , name: 'FILE'
-    }
-]
-```
+## Design
 
-This intermediate format MAY contain ambiguity in it's arguments
-which MUST be resolved for a successful parse. Ambiguity is
-resolved based on the arguments' positions and it is thus important
-to not change the order of elements in the array.
+For the better of for the worse, the approach of this implementation is fairly
+different from the ususal approach of essentially rewriting the original python
+implementation in the target language:
 
-2. The options parser parses options into an intermediate format:
+1. Parse input into `meta` space
+    1. Parse usage lines
+    2. Parse option blocks
+2. Resolve ambiguities: `meta` -> `meta'`
+3. Generate a parser from `meta'` specification
+4. Apply parser to input
 
-```
-... TODO
-```
+## Todo
 
-3. Ambigiuos matches are resolved
-4. A parser is generated for each usage line, and a super-parser
-   houses each parser in a trie.
+* Resolve ambiguities: `meta` -> `meta'`
+* Generate parser from `meta'`
+* Apply parser to input
 
-#### my_program.py -f FILE
+## Wishlist
 
-Ambiguity, must parse bot as flag `-f` with value `FILE`
-as well as flag `-f` and positional argument `FILE`.
-Will be solved by parsed `Options`.
+* Render parse errors for developers
+* Persist `meta'` to disk as JSON to speed things up (maybe)
 
-parse as:
-
-```javascript
-[ { type: 'FLAG'
-  , name: '-f'
-  , value: 'FILE'
-  , ambiguity: 'POSITIONAL'
-  }
-]
-```
-
-#### my_program.py -fFILE
-
-Ambiguity, must parse both as stacked
-`-f -F -I -L -E`, as well as `-f FILE`
-Will be solved by parsed `Options`.
-
-Assume `-fFILE` means `-f` with value
-`FILE`, even though the docopt specs
-default to the opposite.
-
-parse as:
-
-```javascript
-[ { type: 'FLAG'
-  , name: '-f'
-  , value: 'FILE'
-  , ambiguity: 'MERGED_FLAGS'
-  }
-]
-```
+[bennu]: http://bennu-js.com/
