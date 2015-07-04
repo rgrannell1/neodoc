@@ -4,9 +4,72 @@ var _ = require('lodash')
   , parse = require('bennu').parse
   , text = require('bennu').text
   , assert = require('assert')
+  , base = require('../parsers/base')
   , args = require('../parsers/arguments')
 ;
 
+
+var _generateGroup = function(group, options) {
+    return base.cons.apply(null, _.map(_.map(
+        _.foldl(group, function(acc, node) {
+            return (function(head, rest) {
+                console.log('node', node);
+
+                return (
+
+                // ----------------
+                // Parse `command`s
+                // ----------------
+                (node.type === args.OPT_TYPE.COMMAND)
+                  ? acc.concat({
+                        node:   node
+                      , parser: text.string(node.name)
+                    })
+
+                // ----------------------------
+                // Parse `positional` arguments
+                // ----------------------------
+                : (node.type === args.OPT_TYPE.POSITIONAL)
+                  ? acc.concat({
+                        node:   node
+                      , parser: args.positional
+                    })
+
+                // -----------------------
+                // Parse `flags` arguments
+                // -----------------------
+                : (node.type === args.OPT_TYPE.FLAG_LONG)
+                  ? ((head.node.type === args.OPT_TYPE.FLAG_LONG)
+                      ? [ { node:   node
+                          , parser: parse.optional(parse.either(
+                                parse.attempt(head.parser)
+                              , parse.attempt(args.option)
+                            ))
+                          }
+                        , rest ]
+                      : acc.concat({
+                            node:   node
+                          , parser: parse.optional(args.option)
+                      })
+                    )
+
+                // --------------------------
+                // Parse `groups` recursively
+                // XXX
+                // --------------------------
+                : (node.type === args.OPT_TYPE.POSITIONAL)
+                  ? acc.concat({
+                        node:   node
+                      , parser: args.positional
+                    })
+
+                  : acc
+                );
+
+            }(_.head(acc), (_.drop(acc, 1) || [])));
+        }, [])
+      , 'parser'), base.$));
+};
 /*
  * Given a single `usage` and a list of
  * `option` descriptions, infer a parser, that
@@ -22,9 +85,12 @@ var _ = require('lodash')
  *
  * @returns {Parser}
  */
-var _generate = function(usage, options) {
-    return parse.coicea(_.map(usage, function(group) {
-    }));
+var _generateUsage = function(usage, options) {
+    return parse.choicea(
+        _.map(usage, function(group) {
+            return parse.attempt(_generateGroup(group));
+        })
+    );
 };
 
 /*
@@ -42,9 +108,11 @@ var _generate = function(usage, options) {
  * @returns {Parser}
  */
 var generate = function(usages, options) {
+    // console.log('usages', usages);
     return parse.choicea(
         _.map(usages, function(usage) {
-            return parse.attempt(_generate(usage, options));
+            // console.log('usage', usage);
+            return parse.attempt(_generateUsage(usage, options));
         })
     );
 };

@@ -12,21 +12,23 @@ describe('docopt', function() {
     describe('naval_fate ship <name> move <x> <y> [--speed=<kn>]', function() {
         it('should generate a valid parser', function() {
             var p = docopt.generate(
-                parse.run(
+                [parse.run(
                     usage.line('naval_fate')
-                  , 'naval_fate ship <name> move <x> <y> [--speed=<kn>]'
-                )
+                  , 'naval_fate ship <name> move <x> <y> --speed=<kn> --foo --bar'
+                )]
             );
 
             try{
-            parse.run(
+            var x = parse.run(
                 p
-              , 'naval_fate ship "foo" move 10 10 --speed=100'
+              , 'ship "foo" move 10 10 --bar --speed=100 --foo="cool" --speed=200 '
             );
             } catch(e) {
                 console.log(e.toString());
                 throw e;
             }
+
+            console.log(x);
         });
     });
 });

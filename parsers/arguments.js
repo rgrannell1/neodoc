@@ -133,16 +133,26 @@ var positionalArg = _mkPositionalArg(
       , base.join(base.eager1(text.noneOf(' ')))));
 
 /**
- * Parse a long option, either:
- *
- * `--option` or `--option=<arg>`
+ * An argument to the meta option, i.e. one of:
+ *     ARGUMENT
+ *     <argument>
  */
-var _mkLongOption = function(parser) {
-    return base.cons(
+var _metaOptArg =
+    parse.either(
+        parse.attempt(_argname_)
+      , parse.attempt(ARGNAME));
+
+/**
+ * Parse the meta version of a long option, i.e. one of:
+ *     --option
+ *     --option=<arg>
+ */
+var metaLongOption = maybeRepeated(
+    base.cons(
         base.join(base.cons(text.string('--'), argname))
       , parse.optional(parse.choice(
-            parse.attempt(parse.next(text.string('='), parser))
-          , parse.attempt(parse.next(text.string(' '), parser))
+            parse.attempt(parse.next(text.string('='), _metaOptArg))
+          , parse.attempt(parse.next(text.string(' '), _metaOptArg))
         ))
     ).map(_.spread(function(name, arg) {
             return {
@@ -151,61 +161,108 @@ var _mkLongOption = function(parser) {
               , arg:  arg
             };
         }
-    ))
-};
+    )));
 
-var metaLongOption = maybeRepeated(_mkLongOption(
-    parse.either(
-        parse.attempt(_argname_)
-      , parse.attempt(ARGNAME))));
-
-var longOption = _mkLongOption(
+/**
+ * An argument to the option. Can by any
+ * string without spaces or quoted string.
+ */
+var _optArg =
     parse.choice(
         parse.attempt(base.singleQuoted)
       , parse.attempt(base.doubleQuoted)
-      , base.join(base.eager1(text.noneOf(' ')))));
+      , base.join(base.eager1(text.noneOf(' '))));
 
 /**
- * Parse a short unstacked option: `-f`
+ * Parse a long option.
+ *
+ * @param {Boolean} argumentRequired
+ * The returned parser requires the option to
+ * be succeeded by an argument.
+ *
+ * @returns {Parser}
  */
-var _mkShortOptionSingle = function(parser) {
+var longOption = function(argumentRequired) {
     return base.cons(
+        base.join(base.cons(text.string('--'), argname))
+            .map(function(x){
+                console.log('herex');
+                return x;
+            })
+      , ((argumentRequired)
+          ? parse.choice(
+                parse.attempt(parse.next(text.string('='), _optArg))
+              , parse.attempt(parse.next(text.string(' '), _optArg)))
+          : parse.of(null))
+    ).map(_.spread(function(name, arg) {
+            return {
+                type: OPT_TYPE.FLAG_LONG
+              , name: name
+              , arg:  arg
+            };
+        }
+    ));
+};
+
+/**
+ * Parse a short unstacked option, i.e.:
+ *     -f [<argument>]
+ *     -f [ARGUMENT]
+ */
+var metaShortOptionSingle = maybeRepeated(
+    base.cons(
         lang.then(
             base.join(base.cons(text.character('-'), text.letter))
           , parse.not(text.letter)
         )
       , parse.optional(parse.attempt(
-            parse.next(text.string(' '), parser)))
+            parse.next(text.string(' '), _metaOptArg)))
     ).map(_.spread(function(name, arg) {
         return {
             type: OPT_TYPE.FLAG_SHORT
           , name: name
           , arg:  arg
         };
-    }))
-};
-
-var metaShortOptionSingle = _mkShortOptionSingle(
-    parse.either(
-        parse.attempt(_argname_)
-      , parse.attempt(ARGNAME)));
-
-var shortOptionSingle = _mkShortOptionSingle(
-    parse.choice(
-        parse.attempt(base.singleQuoted)
-      , parse.attempt(base.doubleQuoted)
-      , base.join(base.eager1(text.noneOf(' ')))));
+    })));
 
 /**
- * Parse a short unstacked option, e.g.: `-fabc`
+ * Parse a short unstacked option
+ *
+ * @param {Boolean} argumentRequired
+ * The returned parser requires the option to
+ * be succeeded by an argument.
+ *
  */
-var _mkShortOptionStacked = function(parser) {
+var shortOptionSingle = function(argumentRequired) {
     return base.cons(
+        lang.then(
+            base.join(base.cons(text.character('-'), text.letter))
+          , parse.not(text.letter)
+        )
+      , ((argumentRequired)
+          ? parse.attempt(parse.next(text.string(' '), _optArg))
+          : parse.of(null))
+    ).map(_.spread(function(name, arg) {
+        return {
+            type: OPT_TYPE.FLAG_SHORT
+          , name: name
+          , arg:  arg
+        };
+    }));
+};
+
+/**
+ * Parse a short unstacked option, i.e.:
+ *     -fFILE [<argument>]
+ *     -fFILE [ARGUMENT]
+ */
+var metaShortOptionStacked = maybeRepeated(
+    base.cons(
         base.join(base.cons(
             text.character('-')
           , base.join(base.eager1(text.letter))))
       , parse.optional(parse.attempt(
-            parse.next(text.string(' '), parser)
+            parse.next(text.string(' '), _metaOptArg)
             ))
     ).map(_.spread(function(name, arg) {
         return {
@@ -213,19 +270,24 @@ var _mkShortOptionStacked = function(parser) {
           , name: name
           , arg:  arg
         };
+    })));
+
+var shortOptionStacked = function(argumentRequired) {
+    return base.cons(
+        base.join(base.cons(
+            text.character('-')
+          , base.join(base.eager1(text.letter))))
+      , ((argumentRequired)
+          ? parse.attempt(parse.next(text.string(' '), _optArg))
+          : parse.of(null))
+    ).map(_.spread(function(name, arg) {
+        return {
+            type: OPT_TYPE.FLAG_SHORT
+          , name: name
+          , arg:  arg
+        };
     }))
 };
-
-var metaShortOptionStacked = _mkShortOptionStacked(
-    parse.either(
-        parse.attempt(_argname_)
-      , parse.attempt(ARGNAME)));
-
-var shortOptionStacked = _mkShortOptionStacked(
-    parse.choice(
-        parse.attempt(base.singleQuoted)
-      , parse.attempt(base.doubleQuoted)
-      , base.join(base.eager1(text.noneOf(' ')))));
 
 /**
  * Parse a single option, i.e.:
@@ -246,6 +308,7 @@ var metaOption = parse.choice(
 );
 
 /**
+ * Parse a meta option.
  * Parse ambiguos matches:
  * Assume option w/o argument, resolve later:
  *     --output FILE -> [ --output, FILE ]
@@ -257,11 +320,21 @@ var metaOption = parse.choice(
   , parse.attempt(metaShortOptionStacked)
 );
 
-var option = parse.choice(
-    parse.attempt(longOption)
-  , parse.attempt(shortOptionSingle)
-  , parse.attempt(shortOptionStacked)
-);
+/**
+ * Parse an option.
+ *
+ * @param {Boolean} argumentRequired
+ * Does this option require an argument?
+ *
+ * @returns {Parser}
+ */
+var option = function(argumentRequired) {
+    return parse.choice(
+        parse.attempt(longOption(argumentRequired))
+      , parse.attempt(shortOptionSingle(argumentRequired))
+      , parse.attempt(shortOptionStacked(argumentRequired))
+    );
+};
 
 /**
  * Parse an argument, either positional
@@ -271,16 +344,6 @@ var metaArgument = parse.choice(
     parse.attempt(command)
   , maybeOptional(parse.attempt(metaOption))
   , maybeOptional(parse.attempt(metaPositionalArg))
-);
-
-/**
- * Parse an argument, either positional
- * or not.
- */
-var argument = parse.choice(
-    parse.attempt(command)
-  , maybeOptional(parse.attempt(option))
-  , maybeOptional(parse.attempt(positionalArg))
 );
 
 /**
@@ -323,9 +386,9 @@ var metaGroup = parse.rec(function(self) {
 module.exports.option = option;
 module.exports.command = command;
 module.exports.ARGNAME = ARGNAME;
-module.exports.argument = argument;
 module.exports.OPT_TYPE = OPT_TYPE;
 module.exports._argname_ = _argname_;
+module.exports.positional = positionalArg;
 
 module.exports.meta = {};
 module.exports.meta.group = metaGroup;
