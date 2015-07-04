@@ -153,6 +153,12 @@ var metaLongOption = maybeRepeated(_mkLongOption(
         parse.attempt(_argname_)
       , parse.attempt(ARGNAME))));
 
+var longOption = _mkLongOption(
+    parse.choice(
+        parse.attempt(base.singleQuoted)
+      , parse.attempt(base.doubleQuoted)
+      , base.join(base.eager1(text.noneOf(' ')))));
+
 /**
  * Parse a short unstacked option: `-f`
  */
@@ -177,6 +183,12 @@ var metaShortOptionSingle = _mkShortOptionSingle(
     parse.either(
         parse.attempt(_argname_)
       , parse.attempt(ARGNAME)));
+
+var shortOptionSingle = _mkShortOptionSingle(
+    parse.choice(
+        parse.attempt(base.singleQuoted)
+      , parse.attempt(base.doubleQuoted)
+      , base.join(base.eager1(text.noneOf(' ')))));
 
 /**
  * Parse a short unstacked option, e.g.: `-fabc`
@@ -203,10 +215,18 @@ var metaShortOptionStacked = _mkShortOptionStacked(
         parse.attempt(_argname_)
       , parse.attempt(ARGNAME)));
 
+var shortOptionStacked = _mkShortOptionStacked(
+    parse.choice(
+        parse.attempt(base.singleQuoted)
+      , parse.attempt(base.doubleQuoted)
+      , base.join(base.eager1(text.noneOf(' ')))));
+
 /**
  * Parse a single option, i.e.:
- *     --output=<file>, --some-feature
- *     -s, -abc
+ *     --output=<file>
+ *     --some-feature
+ *     -s
+ *     -abc
  *
  * Parse ambiguos matches:
  * Assume option w/o argument, resolve later:
@@ -217,6 +237,24 @@ var metaOption = parse.choice(
     parse.attempt(metaLongOption)
   , parse.attempt(metaShortOptionSingle)
   , parse.attempt(metaShortOptionStacked)
+);
+
+/**
+ * Parse ambiguos matches:
+ * Assume option w/o argument, resolve later:
+ *     --output FILE -> [ --output, FILE ]
+ *     -abc FILE     -> [ -abc,     FILE ]
+ */
+var metaOption = parse.choice(
+    parse.attempt(metaLongOption)
+  , parse.attempt(metaShortOptionSingle)
+  , parse.attempt(metaShortOptionStacked)
+);
+
+var option = parse.choice(
+    parse.attempt(longOption)
+  , parse.attempt(shortOptionSingle)
+  , parse.attempt(shortOptionStacked)
 );
 
 /**
@@ -272,6 +310,8 @@ module.exports.OPT_TYPE = OPT_TYPE;
 module.exports.ARGNAME = ARGNAME;
 module.exports._argname_ = _argname_;
 module.exports.command = command;
+
+module.exports.option = option;
 
 module.exports.meta = {};
 module.exports.meta.group = metaGroup;

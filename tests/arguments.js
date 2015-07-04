@@ -16,7 +16,7 @@ describe('meta', function() {
 
         it('should parse valid ARGNAMEs', function() {
             _.each(valid, function(s) {
-                assert.equal(
+                assert.strictEqual(
                     s
                   , parse.run(args.ARGNAME, s)
                 );
@@ -42,7 +42,7 @@ describe('meta', function() {
 
         it('should parse valid <argument>s', function() {
             _.each(valid, function(s) {
-                assert.equal(
+                assert.strictEqual(
                     s
                   , parse.run(args._argname_, s)
                 );
@@ -76,9 +76,9 @@ describe('meta', function() {
                   , '--output=<arg>'
                 );
 
-                assert.equal(opt.type, args.OPT_TYPE.FLAG_LONG);
-                assert.equal(opt.name, '--output');
-                assert.equal(opt.arg, '<arg>');
+                assert.strictEqual(opt.type, args.OPT_TYPE.FLAG_LONG);
+                assert.strictEqual(opt.name, '--output');
+                assert.strictEqual(opt.arg, '<arg>');
             });
         });
 
@@ -89,9 +89,9 @@ describe('meta', function() {
                   , '--output <arg>'
                 );
 
-                assert.equal(opt.type, args.OPT_TYPE.FLAG_LONG);
-                assert.equal(opt.name, '--output');
-                assert.equal(opt.arg, '<arg>');
+                assert.strictEqual(opt.type, args.OPT_TYPE.FLAG_LONG);
+                assert.strictEqual(opt.name, '--output');
+                assert.strictEqual(opt.arg, '<arg>');
             });
         });
 
@@ -102,8 +102,8 @@ describe('meta', function() {
                   , '--some-feature'
                 );
 
-                assert.equal(opt.type, args.OPT_TYPE.FLAG_LONG);
-                assert.equal(opt.name, '--some-feature');
+                assert.strictEqual(opt.type, args.OPT_TYPE.FLAG_LONG);
+                assert.strictEqual(opt.name, '--some-feature');
             });
         });
 
@@ -114,8 +114,8 @@ describe('meta', function() {
                   , '-f'
                 );
 
-                assert.equal(opt.type, args.OPT_TYPE.FLAG_SHORT);
-                assert.equal(opt.name, '-f');
+                assert.strictEqual(opt.type, args.OPT_TYPE.FLAG_SHORT);
+                assert.strictEqual(opt.name, '-f');
             });
         });
 
@@ -126,13 +126,167 @@ describe('meta', function() {
                   , '-fFILE'
                 );
 
-                assert.equal(opt.type, args.OPT_TYPE.FLAG_SHORT);
-                assert.equal(opt.name, '-fFILE');
+                assert.strictEqual(opt.type, args.OPT_TYPE.FLAG_SHORT);
+                assert.strictEqual(opt.name, '-fFILE');
             });
         });
     });
 });
 
 describe('input', function() {
+    describe('-f "./root"', function() {
+        it('should parse', function() {
+            var opt = parse.run(
+                args.option
+              , '-f "./root"'
+            );
 
+            assert.strictEqual(opt.type, args.OPT_TYPE.FLAG_SHORT);
+            assert.strictEqual(opt.name, '-f');
+            assert.strictEqual(opt.arg, './root');
+        });
+    });
+
+    describe('-f \'./root\'', function() {
+        it('should parse', function() {
+            var opt = parse.run(
+                args.option
+              , '-f \'./root\''
+            );
+
+            assert.strictEqual(opt.type, args.OPT_TYPE.FLAG_SHORT);
+            assert.strictEqual(opt.name, '-f');
+            assert.strictEqual(opt.arg, './root');
+        });
+    });
+
+    describe('-f ./root', function() {
+        it('should parse', function() {
+            var opt = parse.run(
+                args.option
+              , '-f ./root'
+            );
+
+            assert.strictEqual(opt.type, args.OPT_TYPE.FLAG_SHORT);
+            assert.strictEqual(opt.name, '-f');
+            assert.strictEqual(opt.arg, './root');
+        });
+    });
+
+    describe('-abcf ./root', function() {
+        it('should parse', function() {
+            var opt = parse.run(
+                args.option
+              , '-abcf ./root'
+            );
+
+            assert.strictEqual(opt.type, args.OPT_TYPE.FLAG_SHORT);
+            assert.strictEqual(opt.name, '-abcf');
+            assert.strictEqual(opt.arg, './root');
+        });
+    });
+
+    describe('-abcf "./root"', function() {
+        it('should parse', function() {
+            var opt = parse.run(
+                args.option
+              , '-abcf "./root"'
+            );
+
+            assert.strictEqual(opt.type, args.OPT_TYPE.FLAG_SHORT);
+            assert.strictEqual(opt.name, '-abcf');
+            assert.strictEqual(opt.arg, './root');
+        });
+    });
+
+    describe('-abcf \'./root\'', function() {
+        it('should parse', function() {
+            var opt = parse.run(
+                args.option
+              , '-abcf \'./root\''
+            );
+
+            assert.strictEqual(opt.type, args.OPT_TYPE.FLAG_SHORT);
+            assert.strictEqual(opt.name, '-abcf');
+            assert.strictEqual(opt.arg, './root');
+        });
+    });
+
+    describe('--output-file "./root"', function() {
+        it('should parse', function() {
+            var opt = parse.run(
+                args.option
+              , '--output-file "./root"'
+            );
+
+            assert.strictEqual(opt.type, args.OPT_TYPE.FLAG_LONG);
+            assert.strictEqual(opt.name, '--output-file');
+            assert.strictEqual(opt.arg, './root');
+        });
+    });
+
+    describe('--output-file \'./root\'', function() {
+        it('should parse', function() {
+            var opt = parse.run(
+                args.option
+              , '--output-file \'./root\''
+            );
+
+            assert.strictEqual(opt.type, args.OPT_TYPE.FLAG_LONG);
+            assert.strictEqual(opt.name, '--output-file');
+            assert.strictEqual(opt.arg, './root');
+        });
+    });
+
+    describe('--output-file ./root', function() {
+        it('should parse', function() {
+            var opt = parse.run(
+                args.option
+              , '--output-file ./root'
+            );
+
+            assert.strictEqual(opt.type, args.OPT_TYPE.FLAG_LONG);
+            assert.strictEqual(opt.name, '--output-file');
+            assert.strictEqual(opt.arg, './root');
+        });
+    });
+
+    describe('--output-file="./root"', function() {
+        it('should parse', function() {
+            var opt = parse.run(
+                args.option
+              , '--output-file="./root"'
+            );
+
+            assert.strictEqual(opt.type, args.OPT_TYPE.FLAG_LONG);
+            assert.strictEqual(opt.name, '--output-file');
+            assert.strictEqual(opt.arg, './root');
+        });
+    });
+
+    describe('--output-file=\'./root\'', function() {
+        it('should parse', function() {
+            var opt = parse.run(
+                args.option
+              , '--output-file=\'./root\''
+            );
+
+            assert.strictEqual(opt.type, args.OPT_TYPE.FLAG_LONG);
+            assert.strictEqual(opt.name, '--output-file');
+            assert.strictEqual(opt.arg, './root');
+        });
+    });
+
+    describe('--output-file=./root', function() {
+        it('should parse', function() {
+            var opt = parse.run(
+                args.option
+              , '--output-file=./root'
+            );
+
+            assert.strictEqual(opt.type, args.OPT_TYPE.FLAG_LONG);
+            assert.strictEqual(opt.name, '--output-file');
+            assert.strictEqual(opt.arg, './root');
+        });
+    });
 });
