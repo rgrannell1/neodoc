@@ -45,11 +45,12 @@ describe('Resolver', function() {
 
             var resolved = meta.resolve(usage, []);
 
-            console.log(resolved);
-
-            assert.strictEqual(resolved[0].length, 2);
+            assert.strictEqual(resolved[0].length, 5);
             assert.strictEqual(resolved[0][0].type, nodes.TYPE.OPTION);
-            assert.strictEqual(resolved[0][1].type, nodes.TYPE.POSITIONAL);
+            assert.strictEqual(resolved[0][1].type, nodes.TYPE.OPTION);
+            assert.strictEqual(resolved[0][2].type, nodes.TYPE.OPTION);
+            assert.strictEqual(resolved[0][3].type, nodes.TYPE.OPTION);
+            assert.strictEqual(resolved[0][4].type, nodes.TYPE.OPTION);
         });
 
         it('if flag arg does not match (--file FILE)', function() {
@@ -127,13 +128,29 @@ describe('Resolver', function() {
             assert.strictEqual(resolved[0][0].arg, 'FILE');
         });
 
+        it('if flag arg matches (-fFILE)', function() {
+            var usage = parse.run(
+                meta.usage.line('git')
+              , 'git -fFILE'
+            );
+
+            var option = parse.run(
+                meta.options.line
+             , '-f, --file FILE  The file to use.'
+            );
+
+            var resolved = meta.resolve(usage, [ option ]);
+
+            assert.strictEqual(resolved[0].length, 1);
+            assert.strictEqual(resolved[0][0].type, nodes.TYPE.OPTION);
+            assert.strictEqual(resolved[0][0].arg, 'FILE');
+        });
+
         it('if equals sign was used', function() {
             var usage = parse.run(
                 meta.usage.line('git')
               , 'git --file=FILE'
             );
-
-            console.log(usage);
 
             var option = parse.run(
                 meta.options.line

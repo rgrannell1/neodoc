@@ -97,8 +97,8 @@ describe('single option block', function() {
               , '-a  All.'
             );
 
-            assert.equal(option.flags.length, 1);
-            assert.equal(option.flags[0].name, '-a');
+            assert.strictEqual(option.flags.long, undefined);
+            assert.strictEqual(option.flags.short.name, '-a');
         });
     });
 
@@ -110,9 +110,8 @@ describe('single option block', function() {
               , '-a, --all  All.'
             );
 
-            assert.equal(option.flags.length, 2);
-            assert.equal(option.flags[0].name, '-a');
-            assert.equal(option.flags[1].name, '--all');
+            assert.strictEqual(option.flags.short.name, '-a');
+            assert.strictEqual(option.flags.long.name, '--all');
         });
     });
 
@@ -124,11 +123,10 @@ describe('single option block', function() {
               , '-f <file>, --file <file>  All.'
             );
 
-            assert.equal(option.flags.length, 2);
-            assert.equal(option.flags[0].name, '-f');
-            assert.equal(option.flags[0].arg, '<file>');
-            assert.equal(option.flags[1].name, '--file');
-            assert.equal(option.flags[1].arg, '<file>');
+            assert.strictEqual(option.flags.short.name, '-f');
+            assert.strictEqual(option.flags.short.arg, '<file>');
+            assert.strictEqual(option.flags.long.name, '--file');
+            assert.strictEqual(option.flags.long.arg, '<file>');
         });
     });
 
@@ -140,9 +138,8 @@ describe('single option block', function() {
               , '-a, --all  All.'
             );
 
-            assert.equal(option.flags.length, 2);
-            assert.equal(option.flags[0].name, '-a');
-            assert.equal(option.flags[1].name, '--all');
+            assert.strictEqual(option.flags.short.name, '-a');
+            assert.strictEqual(option.flags.long.name, '--all');
         });
     });
 
@@ -154,9 +151,8 @@ describe('single option block', function() {
               , '-a --all  All.'
             );
 
-            assert.equal(option.flags.length, 2);
-            assert.equal(option.flags[0].name, '-a');
-            assert.equal(option.flags[1].name, '--all');
+            assert.strictEqual(option.flags.short.name, '-a');
+            assert.strictEqual(option.flags.long.name, '--all');
         });
     });
 
@@ -167,8 +163,8 @@ describe('single option block', function() {
               , '--all  All.'
             );
 
-            assert.equal(option.flags.length, 1);
-            assert.equal(option.flags[0].name, '--all');
+            assert.strictEqual(option.flags.short, undefined);
+            assert.strictEqual(option.flags.long.name, '--all');
         });
     });
 
@@ -179,9 +175,9 @@ describe('single option block', function() {
               , '--all ALL  All.'
             );
 
-            assert.equal(option.flags.length, 1);
-            assert.equal(option.flags[0].name, '--all');
-            assert.equal(option.flags[0].arg,  'ALL');
+            assert.strictEqual(option.flags.short, undefined);
+            assert.strictEqual(option.flags.long.name, '--all');
+            assert.strictEqual(option.flags.long.arg,  'ALL');
         });
     });
 
@@ -192,9 +188,8 @@ describe('single option block', function() {
               , '--all=<val>  All.'
             );
 
-            assert.equal(option.flags.length, 1);
-            assert.equal(option.flags[0].name, '--all');
-            assert.equal(option.flags[0].arg,  '<val>');
+            assert.strictEqual(option.flags.long.name, '--all');
+            assert.strictEqual(option.flags.long.arg,  '<val>');
         });
     });
 
@@ -206,7 +201,7 @@ describe('single option block', function() {
               , '--all=<val>  All [default: true]'
             );
 
-            assert.strictEqual(option.flags.length, 1);
+            assert.strictEqual(option.flags.short, undefined);
             assert.strictEqual(option.description, 'All');
             assert.strictEqual(option.defaults.length, 1);
             assert.strictEqual(option.defaults[0], 'true');
@@ -222,7 +217,7 @@ describe('single option block', function() {
               + '                 qux '
             );
 
-            assert.strictEqual(option.flags.length, 1);
+            assert.strictEqual(option.flags.short, undefined);
             assert.strictEqual(option.description, 'foo bar qux');
             assert.strictEqual(option.defaults.length, 1);
         });
@@ -237,7 +232,7 @@ describe('single option block', function() {
               + '                 qux    [default: 100]'
             );
 
-            assert.strictEqual(option.flags.length, 1);
+            assert.strictEqual(option.flags.short, undefined);
             assert.strictEqual(option.description, 'foo bar qux');
             assert.strictEqual(option.defaults.length, 1);
         });
@@ -273,11 +268,17 @@ describe('multiple options', function() {
             );
 
             assert.strictEqual(opts.length, 3);
-            assert.strictEqual(opts[0].flags.length, 1);
+
+            assert.strictEqual(opts[0].flags.short, undefined);
+            assert.notStrictEqual(opts[0].flags.long, undefined);
             assert.strictEqual(opts[0].defaults[0], '100');
             assert.strictEqual(opts[0].defaults[1], 'salad');
-            assert.strictEqual(opts[1].flags.length, 1);
-            assert.strictEqual(opts[2].flags.length, 2);
+
+            assert.strictEqual(opts[1].flags.short, undefined);
+            assert.notStrictEqual(opts[1].flags.long, undefined);
+
+            assert.notStrictEqual(opts[2].flags.short, undefined);
+            assert.notStrictEqual(opts[2].flags.long, undefined);
         });
     });
 
