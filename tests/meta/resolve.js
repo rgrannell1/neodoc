@@ -24,6 +24,34 @@ describe('Resolver', function() {
             assert.strictEqual(resolved[0][1].type, nodes.TYPE.POSITIONAL);
         });
 
+        it('if no options provided (-f FILE)', function() {
+            var usage = parse.run(
+                meta.usage.line('git')
+              , 'git -f FILE'
+            );
+
+            var resolved = meta.resolve(usage, []);
+
+            assert.strictEqual(resolved[0].length, 2);
+            assert.strictEqual(resolved[0][0].type, nodes.TYPE.OPTION);
+            assert.strictEqual(resolved[0][1].type, nodes.TYPE.POSITIONAL);
+        });
+
+        it('if no options provided (-fFILE)', function() {
+            var usage = parse.run(
+                meta.usage.line('git')
+              , 'git -fFILE'
+            );
+
+            var resolved = meta.resolve(usage, []);
+
+            console.log(resolved);
+
+            assert.strictEqual(resolved[0].length, 2);
+            assert.strictEqual(resolved[0][0].type, nodes.TYPE.OPTION);
+            assert.strictEqual(resolved[0][1].type, nodes.TYPE.POSITIONAL);
+        });
+
         it('if flag arg does not match (--file FILE)', function() {
             var usage = parse.run(
                 meta.usage.line('git')
@@ -36,19 +64,6 @@ describe('Resolver', function() {
             );
 
             var resolved = meta.resolve(usage, [ option ]);
-
-            assert.strictEqual(resolved[0].length, 2);
-            assert.strictEqual(resolved[0][0].type, nodes.TYPE.OPTION);
-            assert.strictEqual(resolved[0][1].type, nodes.TYPE.POSITIONAL);
-        });
-
-        it('if no options provided (-f FILE)', function() {
-            var usage = parse.run(
-                meta.usage.line('git')
-              , 'git -f FILE'
-            );
-
-            var resolved = meta.resolve(usage, []);
 
             assert.strictEqual(resolved[0].length, 2);
             assert.strictEqual(resolved[0][0].type, nodes.TYPE.OPTION);
