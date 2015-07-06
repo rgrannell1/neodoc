@@ -146,6 +146,24 @@ describe('Resolver', function() {
             assert.strictEqual(resolved[0][0].arg, 'FILE');
         });
 
+        it('if flag arg matches (-abcfFILE)', function() {
+            var usage = parse.run(
+                meta.usage.line('git')
+              , 'git -abcfFILE'
+            );
+
+            var option = parse.run(
+                meta.options.line
+             , '-f, --file FILE  The file to use.'
+            );
+
+            var resolved = meta.resolve(usage, [ option ]);
+
+            assert.strictEqual(resolved[0].length, 4);
+            assert.strictEqual(resolved[0][0].type, nodes.TYPE.OPTION);
+            assert.strictEqual(resolved[0][3].arg, 'FILE');
+        });
+
         it('if equals sign was used', function() {
             var usage = parse.run(
                 meta.usage.line('git')
