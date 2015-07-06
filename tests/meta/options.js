@@ -193,6 +193,60 @@ describe('single option block', function() {
         });
     });
 
+    describe('-a=<val>  All.', function() {
+        it('should parse', function() {
+            var option = parse.run(
+                meta.options.line
+              , '-a=<val>  All.'
+            );
+
+            assert.strictEqual(option.flags.short.name, '-a');
+            assert.strictEqual(option.flags.short.arg,  '<val>');
+        });
+    });
+
+    describe('-a=<val>, --all  All.', function() {
+        it('should parse', function() {
+            var option = parse.run(
+                meta.options.line
+              , '-a=<val>, --all  All.'
+            );
+
+            assert.strictEqual(option.flags.short.name, '-a');
+            assert.strictEqual(option.flags.long.name, '--all');
+            assert.strictEqual(option.flags.short.arg,  '<val>');
+            assert.strictEqual(option.flags.long.arg,  '<val>');
+        });
+    });
+
+    describe('-a, --all=<val>  All.', function() {
+        it('should parse', function() {
+            var option = parse.run(
+                meta.options.line
+              , '-a, --all=<val>  All.'
+            );
+
+            assert.strictEqual(option.flags.short.name, '-a');
+            assert.strictEqual(option.flags.long.name, '--all');
+            assert.strictEqual(option.flags.short.arg,  '<val>');
+            assert.strictEqual(option.flags.long.arg,  '<val>');
+        });
+    });
+
+    describe('-a, --all=<val>  All.', function() {
+        it('should not parse - argument names must not differ', function() {
+            assert.throws(
+                function()  {
+                    parse.run(
+                        meta.options.line
+                      , '-a FOO, --all=<val>  All.'
+                    );
+                }
+              , function(e) { return e instanceof parse.ParseError; }
+            );
+        });
+    });
+
     describe('--all=<val>  All [default: true]', function() {
         it('should parse', function() {
 
