@@ -14,12 +14,11 @@ For the better of for the worse, the approach of this implementation is fairly
 different from the ususal approach of essentially rewriting the original python
 implementation in the target language:
 
-1. Parse input into `meta` space
-    1. Parse `Usage` blocks
-    2. Parse `Option` blocks
-2. Resolve ambiguities: `meta` -> `meta'`
-3. Generate a parser from `meta'` specification
-4. Apply parser to input
+1. Parse many `Option` Block(s)
+1. Parse 1 or more `Usage` Block(s)
+1. Resolve ambiguities: `(Usage : Usage[]) -> (Option[]) -> Meta'`
+1. Generate a parser from `Meta'` specification: `Meta' -> Parser`
+1. Apply parser to input: `Parser -> Input -> Either Error Args`
 
 Because each step is fairly discrete, testing each bit becomes more easily
 achievable. The tests assume more and more known-to-be-working code the further
@@ -38,12 +37,12 @@ down the pipeline it goes.
 
 ## Todo
 
-* Generate parser from `meta'`
-* Apply parser to input
+* Generate a parser from `Meta'` specification: `Meta' -> Parser`
+* Apply parser to input: `Parser -> Input -> Either Error Args`
 
 ## Wishlist
 
 * Render parse errors for developers
-* Persist `meta'` to disk as JSON to speed things up (maybe)
+* Persist `Meta'` to disk as JSON to speed things up (maybe)
 
 [bennu]: http://bennu-js.com/
