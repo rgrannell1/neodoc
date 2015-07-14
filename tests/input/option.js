@@ -12,7 +12,7 @@ describe('input', function() {
     describe('-f "./root"', function() {
         it('should parse', function() {
             var opt = parse.run(
-                option('f', true)
+                option('-f', true)
               , '-f "./root"'
             );
 
@@ -26,7 +26,7 @@ describe('input', function() {
     describe('-f \'./root\'', function() {
         it('should parse', function() {
             var opt = parse.run(
-                option('f', true)
+                option('-f', true)
               , '-f \'./root\''
             );
 
@@ -40,7 +40,7 @@ describe('input', function() {
     describe('-f ./root', function() {
         it('should parse', function() {
             var opt = parse.run(
-                option('f', true)
+                option('-f', true)
               , '-f ./root'
             );
 
@@ -54,7 +54,7 @@ describe('input', function() {
     describe('--output-file "./root"', function() {
         it('should parse', function() {
             var opt = parse.run(
-                option('output-file', true)
+                option('--output-file', true)
               , '--output-file "./root"'
             );
 
@@ -68,7 +68,7 @@ describe('input', function() {
     describe('--output-file \'./root\'', function() {
         it('should parse', function() {
             var opt = parse.run(
-                option('output-file', true)
+                option('--output-file', true)
               , '--output-file \'./root\''
             );
 
@@ -82,7 +82,7 @@ describe('input', function() {
     describe('--output-file ./root', function() {
         it('should parse', function() {
             var opt = parse.run(
-                option('output-file', true)
+                option('--output-file', true)
               , '--output-file ./root'
             );
 
@@ -96,7 +96,7 @@ describe('input', function() {
     describe('--output-file="./root"', function() {
         it('should parse', function() {
             var opt = parse.run(
-                option('output-file', true)
+                option('--output-file', true)
               , '--output-file="./root"'
             );
 
@@ -110,7 +110,7 @@ describe('input', function() {
     describe('--output-file=\'./root\'', function() {
         it('should parse', function() {
             var opt = parse.run(
-                option('output-file', true)
+                option('--output-file', true)
               , '--output-file=\'./root\''
             );
 
@@ -124,7 +124,7 @@ describe('input', function() {
     describe('--output-file=./root', function() {
         it('should parse', function() {
             var opt = parse.run(
-                option('output-file', true)
+                option('--output-file', true)
               , '--output-file=./root'
             );
 
