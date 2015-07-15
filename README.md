@@ -10,8 +10,8 @@ a fairly exhaustive test suite for asserting functionality and parsers.
 
 ## Design
 
-For the better of for the worse, the approach of this implementation is fairly
-different from the ususal approach of essentially rewriting the original python
+For better or for worse, the approach of this implementation is fairly different
+from the ususal approach of essentially rewriting the original python
 implementation in the target language:
 
 1. Parse many `Option` Block(s)
@@ -37,7 +37,6 @@ down the pipeline it goes.
 
 ## Todo
 
-* Generate a parser from `Meta'` specification: `Meta' -> Parser`
 * Apply parser to input: `Parser -> Input -> Either Error Args`
 
 ## Wishlist
