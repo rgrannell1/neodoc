@@ -32,14 +32,14 @@ describe('docopt', function() {
             var parser = docopt.generate(
                 [ parse.run(
                     meta.usage.line('naval_fate')
-                  , 'naval_fate ship <name> move <x> [--speed=<kn> | --foo] <y>'
+                  , 'naval_fate ship <name> move <x> [[--speed=<kn> --bar] --foo] <y>'
                 ) ]
             );
 
             try {
             var args = parse.run(
                 parser
-              , 'ship "foo" move 10 --speed=100 --foo=10 10'
+              , 'ship "foo" move 10 --speed=100 --foo 10'
             );
             } catch(e) { console.log(e.toString()); throw e; }
 
