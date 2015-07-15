@@ -16,10 +16,7 @@ describe('input', function() {
               , '-f "./root"'
             );
 
-            assert.strictEqual(opt.type, nodes.TYPE.OPTION);
-            assert.strictEqual(opt.long, false);
-            assert.strictEqual(opt.name, '-f');
-            assert.strictEqual(opt.arg, './root');
+            assert.strictEqual(opt, './root');
         });
     });
 
@@ -30,10 +27,7 @@ describe('input', function() {
               , '-f \'./root\''
             );
 
-            assert.strictEqual(opt.type, nodes.TYPE.OPTION);
-            assert.strictEqual(opt.long, false);
-            assert.strictEqual(opt.name, '-f');
-            assert.strictEqual(opt.arg, './root');
+            assert.strictEqual(opt, './root');
         });
     });
 
@@ -44,10 +38,7 @@ describe('input', function() {
               , '-f ./root'
             );
 
-            assert.strictEqual(opt.type, nodes.TYPE.OPTION);
-            assert.strictEqual(opt.long, false);
-            assert.strictEqual(opt.name, '-f');
-            assert.strictEqual(opt.arg, './root');
+            assert.strictEqual(opt, './root');
         });
     });
 
@@ -58,10 +49,7 @@ describe('input', function() {
               , '--output-file "./root"'
             );
 
-            assert.strictEqual(opt.type, nodes.TYPE.OPTION);
-            assert.strictEqual(opt.long, true);
-            assert.strictEqual(opt.name, '--output-file');
-            assert.strictEqual(opt.arg, './root');
+            assert.strictEqual(opt, './root');
         });
     });
 
@@ -72,10 +60,7 @@ describe('input', function() {
               , '--output-file \'./root\''
             );
 
-            assert.strictEqual(opt.type, nodes.TYPE.OPTION);
-            assert.strictEqual(opt.long, true);
-            assert.strictEqual(opt.name, '--output-file');
-            assert.strictEqual(opt.arg, './root');
+            assert.strictEqual(opt, './root');
         });
     });
 
@@ -86,10 +71,7 @@ describe('input', function() {
               , '--output-file ./root'
             );
 
-            assert.strictEqual(opt.type, nodes.TYPE.OPTION);
-            assert.strictEqual(opt.long, true);
-            assert.strictEqual(opt.name, '--output-file');
-            assert.strictEqual(opt.arg, './root');
+            assert.strictEqual(opt, './root');
         });
     });
 
@@ -100,10 +82,7 @@ describe('input', function() {
               , '--output-file="./root"'
             );
 
-            assert.strictEqual(opt.type, nodes.TYPE.OPTION);
-            assert.strictEqual(opt.long, true);
-            assert.strictEqual(opt.name, '--output-file');
-            assert.strictEqual(opt.arg, './root');
+            assert.strictEqual(opt, './root');
         });
     });
 
@@ -114,10 +93,7 @@ describe('input', function() {
               , '--output-file=\'./root\''
             );
 
-            assert.strictEqual(opt.type, nodes.TYPE.OPTION);
-            assert.strictEqual(opt.long, true);
-            assert.strictEqual(opt.name, '--output-file');
-            assert.strictEqual(opt.arg, './root');
+            assert.strictEqual(opt, './root');
         });
     });
 
@@ -128,10 +104,7 @@ describe('input', function() {
               , '--output-file=./root'
             );
 
-            assert.strictEqual(opt.type, nodes.TYPE.OPTION);
-            assert.strictEqual(opt.long, true);
-            assert.strictEqual(opt.name, '--output-file');
-            assert.strictEqual(opt.arg, './root');
+            assert.strictEqual(opt, './root');
         });
     });
 });
