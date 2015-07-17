@@ -7,6 +7,7 @@ var fs = require('fs')
   , text = require('bennu').text
   , lang = require('bennu').lang
   , base = require('../lib/parse/base')
+  , docopt = require('../lib/docopt')
 ;
 
 describe('docopt.js', function() {
@@ -19,18 +20,20 @@ describe('docopt.js', function() {
         .map(_.method('split', '"""'))
         .filter('0')
         .map(_.spread(function(usage, rest) {
+            console.log(rest);
             try {
             return { usage: usage, tests: parse.run(
-                parse.eager(parse.many(
+                parse.eager(parse.many1(
                     parse.either(
                         parse.attempt(parse.next(
                             parse.many(text.space)
                           , base.cons(
                                 base.join(base.cons(
                                     text.string('$ prog')
-                                  , parse.eager(parse.many(text.space))
-                                  , base.join(parse.eager(parse.many(
-                                        text.noneOf('\n'))))
+                                  , parse.eager(parse.many(text.match(/ /)))
+                                  , parse.optional('', parse.attempt(
+                                        base.join(parse.eager(parse.many(
+                                            text.noneOf('\n'))))))
                                 ))
                               , parse.either(
                                     parse.attempt(parse.next(
@@ -43,10 +46,13 @@ describe('docopt.js', function() {
                                           , text.string('}')
                                           , base.join(
                                                 parse.eager(parse.many(
-                                                    text.noneOf('}'))))))
+                                                    text.noneOf('}')))))
                                         .map(function(x) {
-                                            return JSON.parse('{' + x + '}');
+                                            return JSON.parse(
+                                                '{' + x + '}'
+                                            );
                                         })
+                                    )
                                 )
                             )
                         )).map(_.spread(function(cmd, output) {
@@ -57,6 +63,8 @@ describe('docopt.js', function() {
               , rest
             ) };
             } catch(e) {
+                console.log('>', rest.replace(/\n/g, ' '));
+                console.log('>', _.repeat(' ', 12) + _.repeat('^', 3));
                 console.log(e.toString());
                 throw e;
             }
@@ -64,12 +72,15 @@ describe('docopt.js', function() {
         .value();
 
     _.each(suites, function(suite, i) {
-        describe('docopt test # ' + i, function() {
+        describe('docopt test # ' + (i + 1), function() {
             _.each(suite.tests, function(test) {
                 it('`' + test.cmd
                  + '` should yield `' + JSON.stringify(test.output) + '`'
-                 , function() {
-                });
+                  , function() {
+                        var meta = docopt.parse(suite.usage)
+                          , parser = docopt.generate(meta);
+                    }
+                );
             });
         });
     });
