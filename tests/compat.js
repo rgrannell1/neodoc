@@ -2,6 +2,7 @@
 
 var fs = require('fs')
   , _ = require('lodash')
+  , assert = require('assert')
   , path = require('path')
   , parse = require('bennu').parse
   , text = require('bennu').text
@@ -55,8 +56,8 @@ describe('docopt.js', function() {
                                     )
                                 )
                             )
-                        )).map(_.spread(function(cmd, output) {
-                            return { cmd: cmd, output: output };
+                        )).map(_.spread(function(input, output) {
+                            return { input: input, output: output };
                         }))
                       , parse.eof)
                 ))
@@ -69,16 +70,23 @@ describe('docopt.js', function() {
                 throw e;
             }
         }))
+        .take(1)
         .value();
 
     _.each(suites, function(suite, i) {
         describe('docopt test # ' + (i + 1), function() {
             _.each(suite.tests, function(test) {
-                it('`' + test.cmd
+                it('`' + test.input
                  + '` should yield `' + JSON.stringify(test.output) + '`'
                   , function() {
                         var meta = docopt.parse(suite.usage)
-                          , parser = docopt.generate(meta);
+                          , parser = docopt.generate(meta)
+                        ;
+
+                        assert(_.isEqual(
+                            docopt.run(parser, test.input)
+                          , test.output
+                        ));
                     }
                 );
             });
