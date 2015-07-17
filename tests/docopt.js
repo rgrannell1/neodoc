@@ -8,47 +8,51 @@ var _ = require('lodash')
 ;
 
 describe('docopt', function() {
+
+    var runParser = function(p, c) {
+        try {
+            return parse.run(p, c);
+        } catch(e) {
+            console.log(e.toString());
+            throw e;
+        }
+    };
+
     describe('naval_fate ship <name> move <x> <y> [--speed=<kn>]', function() {
 
         it('should parse `ship "foo" move 10 10 --speed=10`', function() {
             var parser = docopt.generate(
-                [ parse.run(
+                [ runParser(
                     meta.usage.line('naval_fate')
                   , 'naval_fate ship <name> move <x> <y> [--speed=<kn>]'
                 ) ]
             );
 
-            try {
-            var args = parse.run(
+            var args = runParser(
                 parser
-              , 'ship "foo" move 10 10 --speed=10'
-            );
-            } catch(e) { console.log(e.toString()); throw e; }
+              , 'ship "foo" move 10 10 --speed=10');
 
-            console.log(args);
+            console.log(JSON.stringify(args, null, 2));
         });
 
         it('should parse `ship "foo" move 10 10`', function() {
             var parser = docopt.generate(
-                [ parse.run(
+                [ runParser(
                     meta.usage.line('naval_fate')
                   , 'naval_fate ship <name> move <x> [[--speed=<kn> --bar] --foo] <y>'
                 ) ]
             );
 
-            try {
-            var args = parse.run(
+            var args = runParser(
                 parser
-              , 'ship "foo" move 10 --speed=100 --foo 10'
-            );
-            } catch(e) { console.log(e.toString()); throw e; }
+              , 'ship "foo" move 10 --speed=100 --foo 10');
 
             console.log(JSON.stringify(args, null, 2));
         });
 
         it('should fail to parse `ship move 10 10 --speed=10`', function() {
             var parser = docopt.generate(
-                [ parse.run(
+                [ runParser(
                     meta.usage.line('naval_fate')
                   , 'naval_fate ship <name> move <x> <y> [--speed=<kn>]'
                 ) ]
@@ -56,7 +60,7 @@ describe('docopt', function() {
 
             assert.throws(
                 function() {
-                    var args = parse.run(
+                    var args = runParser(
                         parser
                       , 'ship move 10 10 --speed'
                     );
