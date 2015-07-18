@@ -11,6 +11,9 @@ var fs = require('fs')
   , docopt = require('../lib/docopt')
 ;
 
+/*
+ * Run the official docopt test suite.
+ */
 describe('docopt.js', function() {
     var suites = _(fs.readFileSync(
         path.resolve(

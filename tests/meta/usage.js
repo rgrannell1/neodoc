@@ -6,6 +6,7 @@ var _ = require('lodash')
   , assert = require('assert')
   , nodes = require('../../lib/parse/nodes')
   , meta = require('../../lib/parse/meta')
+  , util = require('../../lib/util')
 ;
 
 /**
@@ -184,5 +185,31 @@ describe('defaults', function() {
             assert.strictEqual(line[0][4].nodes[1][0].modifiers.repeating, false);
             assert.strictEqual(line[0][4].nodes[1][0].modifiers.optional, false);
         });
+    });
+});
+
+describe('block', function() {
+    it('can be parsed', function() {
+        var usageText = util.mstr('\
+            Usage: program foo         \n\
+                   program bar\n\
+\n\
+            asdfsadf\
+        ');
+
+        try{
+        var usage = parse.run(
+            meta.usage
+          , usageText
+        );
+        } catch(e) {
+            console.log(usageText);
+            console.log(e.toString());
+            console.log(usageText.replace(/\n/g, ' '));
+            console.log(_.repeat(' ', e.position - 1) + '^');
+            throw e;
+        }
+
+        console.log(JSON.stringify(usage, null, 2));
     });
 });
